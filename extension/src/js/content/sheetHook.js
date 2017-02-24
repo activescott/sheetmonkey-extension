@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
 
-class CommandManager {
+class SheetHook {
     constructor(context) {
         this._context = context;
         this._document = context.document;
@@ -9,11 +9,8 @@ class CommandManager {
     }
 
     initDocumentListeners() {
-        this.log('initDocumentListeners');
-
         // Should we be doing this via context.doc /this.doc instead? Jquery seems to find the document ok and is more resiliant.
         $(() => {
-            this.log('doc load');
             this.onSmartsheetLoaded();
         });
     }
@@ -49,4 +46,4 @@ class CommandManager {
     }
 }
 
-export default CommandManager;
+export default SheetHook;

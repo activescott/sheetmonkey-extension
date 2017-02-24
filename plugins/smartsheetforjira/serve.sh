@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m SimpleHTTPServer 8000
+python -m SimpleHTTPServer 8100

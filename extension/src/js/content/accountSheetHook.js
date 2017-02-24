@@ -1,14 +1,14 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
-import CommandManager from './commandManager.js';
+import SheetHook from './sheetHook.js';
 
-class AccountCommandManager extends CommandManager {
+class AccountSheetHook extends SheetHook {
     constructor(context) {
         super(context);
     }
 
     onSmartsheetLoaded() {
-        this.log('AccountCommandManager.onSmartsheetLoaded');
+        this.log('AccountSheetHook.onSmartsheetLoaded');
         this.initSmartsheetHooks();
     }
 
@@ -91,7 +91,7 @@ class AccountCommandManager extends CommandManager {
             }
             var placeHolderElement = null;
             for (var p of this.context.plugins) {
-                for (var c of p.commands) {
+                for (var c of p.manifest.commands) {
                     //FIXME: constants module!
                     if (c.kind == 'account_menu') {
                         this.log('initAccountMenuCommands: found command ', c);
@@ -138,4 +138,4 @@ class AccountCommandManager extends CommandManager {
     }
 }
 
-export default AccountCommandManager;
+export default AccountSheetHook;
