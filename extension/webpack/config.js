@@ -5,6 +5,8 @@ module.exports = {
     background: './src/js/background/background',
     content: './src/js/content/content',
     options: './src/js/options/options',
+    sheetMonkeyHost: './src/js/sheetMonkeyHost/sheetMonkeyHost'
+
   },
   output: {
     filename: './js/[name].js'

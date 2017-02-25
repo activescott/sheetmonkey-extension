@@ -1,0 +1,1 @@
+This is content that can be loaded inside of the actual plugin frame.

@@ -1,14 +1,18 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
 import SheetHook from './sheetHook.js';
+import Constants from '../modules/Constants.js';
+import Diag from '../modules/diag.js';
+
+const D = new Diag('AccountSheetHook');
 
 class AccountSheetHook extends SheetHook {
-    constructor(context) {
-        super(context);
+    constructor(pluginHost, plugins, document) {
+        super(pluginHost, plugins, document);
     }
 
     onSmartsheetLoaded() {
-        this.log('AccountSheetHook.onSmartsheetLoaded');
+        D.log('AccountSheetHook.onSmartsheetLoaded');
         this.initSmartsheetHooks();
     }
 
@@ -30,16 +34,16 @@ class AccountSheetHook extends SheetHook {
     handleCommandEvent(e) {
         if (e == null || e.target == null)
             return false;
-        //FIXME: Constants module!
         var target = $(e.target);
         var parent = target.parent();
-        var isCommand = parent.hasClass('sheetMonkeyCommand');
+        var isCommand = parent.hasClass(Constants.commandClassName);
         var eventType = e.type;
         if (eventType == 'click' && isCommand) {
-            var pluginID = parent.attr('data-sheetmonkey-pluginid');
-            var commandID = parent.attr('data-sheetmonkey-commandid');
-            this.log('TODO! Route command click to plugin! PluginID:', pluginID, 'CommandID:', commandID);
+            var pluginId = parent.attr('data-sheetmonkey-pluginid');
+            var commandId = parent.attr('data-sheetmonkey-commandid');
             this.dismissAccountMenu();
+            D.log('Routing command click to plugin... PluginID:', pluginId, 'CommandID:', commandId);
+            this.pluginHost.notifyCommandClicked(pluginId, commandId);
             return true;
         }
         return false
@@ -60,6 +64,7 @@ class AccountSheetHook extends SheetHook {
      * Returns Promise<Boolean> if the account menu commands should be injected/initialized.
      */
     shouldInitAccountMenuCommands() {
+        //TODO: setup a much shorter delay and retry it a few times.
         //delay 500ms to give the account menu a chance to get into the DOM
         return Promise.delay(500).then(() => {
             var shouldInit = false;
@@ -67,12 +72,12 @@ class AccountSheetHook extends SheetHook {
             var accountMenu = this.getAccountMenuElement();
             if (accountMenu.length > 0) {
                 // does the account menu already have plugins:
-                var foundCommands = accountMenu.has('.sheetMonkeyCommand');
+                var foundCommands = accountMenu.has('.' + Constants.commandClassName);
                 //if (foundCommands.length > 0) this.log('Account menu already has SheetMonkey commands.');
                 shouldInit = foundCommands.length == 0;
             }
             else {
-                this.log('Account menu not found.');
+                D.log('Account menu not found.');
                 shouldInit = false;
             }
             return shouldInit;
@@ -86,22 +91,22 @@ class AccountSheetHook extends SheetHook {
             }
             var signOutMenuItem = $('tr[data-client-id="10727"]');
             if (signOutMenuItem.length == 0) {
-                this.warn('initAccountMenuCommands: Smartsheet "Sign Out" menu item NOT found!');
+                D.warn('initAccountMenuCommands: Smartsheet "Sign Out" menu item NOT found!');
                 return;
             }
             var placeHolderElement = null;
-            for (var p of this.context.plugins) {
+            for (var p of this.plugins) {
                 for (var c of p.manifest.commands) {
                     //FIXME: constants module!
                     if (c.kind == 'account_menu') {
-                        this.log('initAccountMenuCommands: found command ', c);
+                        D.log('initializing command ', c);
                         if (placeHolderElement==null) {
                             // no elements inserted yet...
                             placeHolderElement = this.getMenuDivider();
                             signOutMenuItem.after(placeHolderElement);
                             placeHolderElement = placeHolderElement[1];// hack it returns two elements and we want the second one.
                         }
-                        var menuItem = this.getMenuElement(p.id, c.id, c.label);
+                        var menuItem = this.getMenuElement(p.manifest.id, c.id, c.label);
                         placeHolderElement.after(menuItem);
                         placeHolderElement = menuItem;
                     }
@@ -112,7 +117,7 @@ class AccountSheetHook extends SheetHook {
     }
 
     initCommandEvents() {
-        $('.sheetMonkeyCommand').hover(
+        $('.' + Constants.commandClassName).hover(
             function() { $(this).addClass('clsListRowHover'); },
             function() { $(this).removeClass('clsListRowHover'); }
         );
@@ -127,14 +132,15 @@ class AccountSheetHook extends SheetHook {
     }
 
     getMenuElement(pluginId, commandId, label) {
-        var template = `<tr id="sheetMonkey_${pluginId}_${commandId}" data-sheetmonkey-pluginid="${pluginId}" data-sheetmonkey-commandId="${commandId}" class="sheetMonkeyCommand"><td style="margin-top:2px; height:16px; padding-left:15px;"></td><td style="padding-right:15px; padding-left:0px; white-space:nowrap;" class="clsStandardMenuText">${label}</td><td><div style="width:20px;height:20px;padding-right:5px"></div></td></tr>`
+        //TODO: Encode the pluginId/commandId values!!
+        var template = `<tr id="sheetMonkey_${pluginId}_${commandId}" data-sheetmonkey-pluginid="${pluginId}" data-sheetmonkey-commandId="${commandId}" class="${Constants.commandClassName}"><td style="margin-top:2px; height:16px; padding-left:15px;"></td><td style="padding-right:15px; padding-left:0px; white-space:nowrap;" class="clsStandardMenuText">${label}</td><td><div style="width:20px;height:20px;padding-right:5px"></div></td></tr>`
         return $(template);
     }
 
     initCommands() {
         this.initAccountMenuCommands()
-            .then(() => this.log('initAccountMenuCommands complete.'))
-            .catch(e => this.error('initCommands failed: ', e));
+            .then(() => D.log('initAccountMenuCommands complete.'))
+            .catch(e => D.error('initCommands failed: ', e));
     }
 }
 

@@ -1,10 +1,16 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
+import Diag from '../modules/diag.js';
+const D = new Diag('SheetHook');
 
 class SheetHook {
-    constructor(context) {
-        this._context = context;
-        this._document = context.document;
+    constructor(pluginHost, plugins, document) {
+        if (pluginHost== null || plugins==null || document==null) {
+            throw 'missing arguments';
+        }
+        this._pluginHost = pluginHost;
+        this._plugins = plugins;
+        this._document = document;
         this.initDocumentListeners();
     }
 
@@ -19,30 +25,19 @@ class SheetHook {
         return this._document;
     }
 
-    get context() {
-        return this._context;
+    get pluginHost() {
+        return this._pluginHost;
     }
 
-    log(...args) {
-        let t = __filename;
-        console.log(`${t}:`, ...args);
-    }
-
-    warn(...args) {
-        let t = __filename;
-        console.warn(`${t}:`, ...args);
-    }
-
-    error(...args) {
-        let t = __filename;
-        console.warn(`${t}:`, ...args);
+    get plugins() {
+        return this._plugins;
     }
 
     /**
      * Triggered when the document for Smartsheet is loaded and available.
      */
     onSmartsheetLoaded () {
-        console.log('onSmartsheetLoaded');
+        D.log('onSmartsheetLoaded');
     }
 }
 

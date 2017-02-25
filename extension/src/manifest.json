@@ -8,7 +8,7 @@
   }],
   "options_page": "html/options.html",
   "permissions": [ "tabs", "https://app.smartsheet.com/" ],
-  "web_accessible_resources": [ "js/*", "html/*", "css/*", "images/*" ],
+  "web_accessible_resources": [ "js/sheetMonkeyHost.js" ],
   "name": "<%= package.name %>",
   "version": "<%= package.version %>",
   "description": "<%= package.description %>"
