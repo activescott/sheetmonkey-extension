@@ -8,9 +8,9 @@ const D = new Diag('PluginHost');
 class PluginHost {
     constructor(document, plugins) {
         if (document == null)
-            throw 'document must be provided';
+            throw new Error('document must be provided');
         if (plugins == null)
-            throw 'plugins must be provided';
+            throw new Error('plugins must be provided');
         this._document = document;
         this._plugins = plugins;
         this.hostPlugins();
