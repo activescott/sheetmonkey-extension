@@ -1,7 +1,6 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
 import msg from '../modules/msg';
-import handlers from './msghandlers.js'
 import AccountSheetHook from './accountSheetHook.js';
 import PluginHost from './pluginHost.js';
 import Diag from '../modules/diag.js';
@@ -12,7 +11,7 @@ var sheetHooks = null;
 
 D.log('SheetMonkey content script loaded.');
 
-const messenger = msg.init('content', handlers.create('content'));
+const messenger = msg.init('content', { });
 
 initPlugins();
 

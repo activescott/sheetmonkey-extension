@@ -7,7 +7,7 @@
     "js": [ "js/content.js" ]
   }],
   "options_page": "html/options.html",
-  "permissions": [ "tabs", "https://app.smartsheet.com/", "storage" ],
+  "permissions": [ "tabs", "https://app.smartsheet.com/", "storage", "http://*/", "https://*/" ],
   "web_accessible_resources": [ "js/sheetMonkeyHost.js" ],
   "name": "<%= package.name %>",
   "version": "<%= package.version %>",

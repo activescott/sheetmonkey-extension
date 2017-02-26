@@ -6,7 +6,7 @@ const D = new Diag('SheetHook');
 class SheetHook {
     constructor(pluginHost, plugins, document) {
         if (pluginHost== null || plugins==null || document==null) {
-            throw 'missing arguments';
+            throw new Error('missing arguments');
         }
         this._pluginHost = pluginHost;
         this._plugins = plugins;

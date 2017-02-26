@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
 import msg from '../modules/msg';
+import Storage from '../modules/storage';
 import Diag from '../modules/diag';
 
 const D = new Diag('options');
@@ -10,6 +11,14 @@ class Opt {
     constructor() {
         this.load();
         this.listen();
+        this.messenger = msg.init('options', {
+            loadPluginUrls: (done) => {
+                D.log('loadPluginUrls message received!');
+                Storage.loadUrls().then(urls => {
+                    done(urls);
+                });
+            }
+        });
     }
 
     listen() {
@@ -99,30 +108,15 @@ class Opt {
     }
     
     save() {
-        return new Promise((resolve, reject) => { 
-            let urls = this.list.children('option[data-url]').toArray().map(el => $(el).attr('data-url'));
-            D.log('saving urls', urls);
-            let storageData = { manifestUrls: urls };
-            chrome.storage.sync.set(storageData, () => {
-                if (chrome.runtime.lastError)
-                    return reject(chrome.runtime.lastError);
-                return resolve();
-            });
-        });
+        let urls = this.list.children('option[data-url]').toArray().map(el => $(el).attr('data-url'));
+        return Storage.savePluginUrls(urls).then(() => D.log('urls saved.'));
     }
 
     load() {
-        return new Promise((resolve, reject) => {
-            const defaultData = { manifestUrls: [] };
-            chrome.storage.sync.get(defaultData, (storedData) => {
-                if (chrome.runtime.lastError)
-                    return reject(chrome.runtime.lastError);
-                //now load options into UI:
-                this.removeAllListItems();
-                D.log('loaded urls:', storedData.manifestUrls);
-                storedData.manifestUrls.forEach(url => this.addListItem(url));
-                return resolve(storedData);
-            });
+        return Storage.loadPluginUrls().then(urls => {
+            //now load options into UI:
+            this.removeAllListItems();
+            urls.forEach(url => this.addListItem(url));
         });
     }
 }

@@ -97,8 +97,7 @@ class AccountSheetHook extends SheetHook {
             var placeHolderElement = null;
             for (var p of this.plugins) {
                 for (var c of p.manifest.commands) {
-                    //FIXME: constants module!
-                    if (c.kind == 'account_menu') {
+                    if (c.kind == Constants.account_menu) {
                         D.log('initializing command ', c);
                         if (placeHolderElement==null) {
                             // no elements inserted yet...
@@ -132,9 +131,20 @@ class AccountSheetHook extends SheetHook {
     }
 
     getMenuElement(pluginId, commandId, label) {
-        //TODO: Encode the pluginId/commandId values!!
-        var template = `<tr id="sheetMonkey_${pluginId}_${commandId}" data-sheetmonkey-pluginid="${pluginId}" data-sheetmonkey-commandId="${commandId}" class="${Constants.commandClassName}"><td style="margin-top:2px; height:16px; padding-left:15px;"></td><td style="padding-right:15px; padding-left:0px; white-space:nowrap;" class="clsStandardMenuText">${label}</td><td><div style="width:20px;height:20px;padding-right:5px"></div></td></tr>`
-        return $(template);
+        // building via jquery for proper/safe encoding:
+        let tr = $('<tr>');
+        tr.addClass(Constants.commandClassName);
+        tr.attr('id', `sheetMonkey_${pluginId}_${commandId}`);
+        tr.attr('data-sheetmonkey-pluginid', pluginId);
+        tr.attr('data-sheetmonkey-commandid', commandId);
+        let td1 = $('<td style="margin-top:2px; height:16px; padding-left:15px;"></td>');
+        let td2 = $('<td style="padding-right:15px; padding-left:0px; white-space:nowrap;" class="clsStandardMenuText"></td>');
+        td2.text(label);
+        let td3 = $('<td><div style="width:20px;height:20px;padding-right:5px"></div></td>');
+        tr.append(td1);
+        tr.append(td2);
+        tr.append(td3);
+        return tr;
     }
 
     initCommands() {

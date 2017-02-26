@@ -11,11 +11,11 @@ class SheetMonkeyHost {
         D.log('in the hizzouse!');
         window.addEventListener("message", this.receiveMessage.bind(this), false);
         if (!options)
-            throw 'options missing';
+            throw new Error('options missing');
         if (!options.commandHandler)
-            throw 'commandHandler missing';
+            throw new Error('commandHandler missing');
         if (!options.pluginId)
-            throw 'pluginId missing'
+            throw new Error('pluginId missing');
         this._pluginId = options.pluginId;
         this._commandHandler = options.commandHandler;
     }
