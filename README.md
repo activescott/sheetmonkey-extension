@@ -56,16 +56,7 @@ You initialize your plugin by calling `SheetMonkeyHost.init` and passing in the 
 See [sheetmonkey-plugins](https://github.com/activescott/sheetmonkey-plugins) for examples.
 
 ## TODO ##
-* When one plugin manifest fails to load, make sure the others still load.
-* ssfsf
-* Sheet Command (permalink)
-* Row Command (permalink)
-* Col Command (json)
-* Col Indicators
-* Row indicators?
-* SheetMonkeyHost.toast - Displays a toast message to the user with text.
-
-
+See TODO.md
 
 ## License 
 * See [LICENSE](https://github.com/activescott/sheetmonkey/blob/master/LICENSE.md) file.

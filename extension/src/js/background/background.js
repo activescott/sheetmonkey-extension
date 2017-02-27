@@ -27,34 +27,46 @@ class Background {
     getRegisteredPluginsImpl() {
         return Storage.loadPluginUrls().then(urls => {
             return Promise.map(urls, url => {
-                // TODO: wrap xhr in it's own promise func.
-                return new Promise((resolve, reject) => {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("GET", url, true);
-                    xhr.onreadystatechange = () => {
-                        if (xhr.readyState == 4) {
-                            try {
-                                let manifest = {};
-                                try {
-                                    manifest = JSON.parse(xhr.responseText);
-                                } catch (e) {
-                                    return reject(new Error(`Failed to parse JSON from url '${url}'. Error: ${e}\n Complete response:'${xhr.responseText}'`))
-                                }
-                                D.log(`Preparing the following manifest from url '${url}':`, JSON.stringify(manifest));
-                                let plugin = { };
-                                plugin.manifestUrl = url;
-                                plugin.baseUrl = Background.parseBaseUrl(url);
-                                plugin.manifest = Background.sanitizeManifest(manifest);
-                                return resolve(plugin);
-                            } catch (e) {
-                                return reject(new Error(`Failed to load manifest from url '${url}'. Error:${e}`));
-                            }
-                        }
-                    }
-                    xhr.send();
+                return Background.xhrGetJSON(url).catch(e => {
+                    // NOTE: Just log and ignore, don't don't throw. We'll recover by adding a null into the promise chain
+                    D.error(`Failed to get JSON manifest from url '${url}'. Error: ${e}`);
+                    return null;
+                }).then(manifest => {
+                    D.log(`Preparing the following manifest from url '${url}':`, JSON.stringify(manifest));
+                    if (!manifest)
+                        return null;// nulls filtered out in promise chain
+                    let plugin = { };
+                    plugin.manifestUrl = url;
+                    plugin.baseUrl = Background.parseBaseUrl(url);
+                    plugin.manifest = Background.sanitizeManifest(manifest);
+                    return plugin;
                 });
+            }).then(plugins => {
+                return plugins.filter(p => p!=null);
             });
         });
+    }
+
+    /**
+     * Returns JSON from the specified URL as a promise.
+     */
+    static xhrGetJSON(url) {
+        return new Promise((resolve, reject) => {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState == 4) {
+                    if (xhr.status < 200 || xhr.status >= 300)
+                        return reject(new Error(`Server at url '${url}' returned error status '${xhr.status}'. StatusText: '${xhr.statusText}'`));
+                    try {
+                        return resolve(JSON.parse(xhr.responseText));
+                    } catch (e) {
+                        return reject(new Error(`Failed to parse JSON from url '${url}'. Error: ${e}\n Response was: '${xhr.responseText}'`))
+                    }
+                }
+            }
+            xhr.send();
+        });        
     }
 
     static sanitizeManifest(manifest) {
@@ -75,7 +87,7 @@ class Background {
     static parseBaseUrl(url) {
         let slashIndex = url.lastIndexOf('/');
         if (slashIndex < 0)
-            throw new Error('invalid url');
+            throw new Error('invalid url:' + url);
         if (slashIndex == url.length-1)
             return url;
         return url.substring(0, slashIndex+1);

@@ -37,7 +37,6 @@ class PluginHost {
             let scripts = urls.map(u => $('<script>').attr('src', u));
             let html = $('<html>').append(scripts);
             let srcDoc = html.prop('outerHTML');
-            D.log('srcDoc:', srcDoc);
             let iframe = $('<iframe sandbox="allow-scripts allow-modals allow-popups allow-forms allow-popups-to-escape-sandbox" style="display:none"></iframe>');
             iframe.attr('id', `sheetmonkey_${plugin.manifest.id}`);
             iframe.attr('data-sheetmonkey-pluginid', plugin.manifest.id);
@@ -47,7 +46,6 @@ class PluginHost {
     }
 
     getPluginFrame(pluginId) {
-        //TODO: ensure pluginId is encoded! - This encoding/safe id values needs to be done in background before they ever get to content. They should be safe for attribute values
         let frame = $(`iframe[data-sheetmonkey-pluginid="${pluginId}"]`);
         D.assert(frame.length == 1, 'expected exactly one plugin host!');
         return frame.first();
@@ -55,10 +53,10 @@ class PluginHost {
 
     postMessageToPlugin(pluginId, message) {
         let f = this.getPluginFrame(pluginId);
-        D.log('pluginFrame:', f);
-        //https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+        if (f == null || (f.length && f.length == 0)) {
+            throw new Error(`frame for plugin '${pluginId}' not found.`);
+        }
         let window = f.prop('contentWindow');
-        D.log('window:', window);
         const targetOrigin = '*';
         window.postMessage(message, targetOrigin);
     }
