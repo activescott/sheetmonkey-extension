@@ -8,6 +8,12 @@ class Constants {
     static get account_menu() {
         return 'account_menu';
     }
+    static get messageGetContainerID() {
+        return 'messageGetContainerID';
+    }
+    static get messageGetContainerIDResponse() {
+        return 'messageGetContainerIDResponse';
+    }
 }
 
 export default Constants;

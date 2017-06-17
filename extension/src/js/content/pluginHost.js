@@ -56,6 +56,10 @@ class PluginHost {
         if (f == null || (f.length && f.length == 0)) {
             throw new Error(`frame for plugin '${pluginId}' not found.`);
         }
+        // ensure the message has pluginId on it:
+        if (!message.pluginId)
+            message.pluginId = pluginId;
+
         let window = f.prop('contentWindow');
         const targetOrigin = '*';
         window.postMessage(message, targetOrigin);

@@ -15,7 +15,7 @@ Don't have a plugin? See Creating Plugins below!
 
 ## Compiling & Debugging ##
 1. Go to the root and run `npm install` (or `yarn`) to install dependencies.
-2. Run `./dev.sh` to build it in development mode. It will build and put output in `/build/dev` (using webpack watch to keep the js up to date).
+2. Run `./extension/dev.sh` to build it in development mode. It will build and put output in `/build/dev` (using webpack watch to keep the js up to date).
 3. Visit [chrome://extensions/](chrome://extensions/), ensure *Developer mode* is checked and use *Load unpacked extension* to load the extension from `/build/dev`.
 
 
@@ -26,12 +26,17 @@ Plugins consist of a JSON manifest and JavaScript hosted in the same directory.
 Plugins can expose the following capabilities: 
 
 * Account Menu Commands: Allows your plugin to add a menu item to the *Account* menu in Smartsheet and respond to clicks.
-* FUTURE: Sheet Menu Commands...
-* FUTURE: Row Menu Commands...
-* FUTURE: Column Menu Commands...
-* FUTURE: Dynamically updating menu commands (their label for localization, visibility, enabled status, etc.)
-* FUTURE: Column Indicators
-* FUTURE: Make it easier for a command to auth & call the Smartsheet API.
+* FUTURE:
+    * Sheet Menu Commands...
+    * Row Menu Commands...
+    * Column Menu Commands...
+    * Card Menu Commands...
+    * Dynamically updating menu commands (their label for localization, visibility, enabled status, etc.)
+    * Column Indicators
+    * Make it easier for a command to auth & call the Smartsheet API.
+    * Custom cell renderers (via formulas functions)
+        * Markdown, sparklines, etc.
+    * Keyboard shortcuts
 
 ### Manifest Format ###
 Below is a commented manifest (note comments aren't allowed in the actual JSON though).

@@ -15,7 +15,7 @@ class SheetHook {
     }
 
     initDocumentListeners() {
-        // Should we be doing this via context.doc /this.doc instead? Jquery seems to find the document ok and is more resiliant.
+        // Should we be doing this via this.doc instead? Jquery seems to find the document ok and is more resilient.
         $(() => {
             this.onSmartsheetLoaded();
         });

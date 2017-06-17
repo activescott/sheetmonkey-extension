@@ -6,13 +6,15 @@ import Diag from '../modules/diag.js';
 
 const D = new Diag('AccountSheetHook');
 
+/**
+ * Hooks into the Account menu so that new menu items can be added there.
+ */
 class AccountSheetHook extends SheetHook {
     constructor(pluginHost, plugins, document) {
         super(pluginHost, plugins, document);
     }
 
     onSmartsheetLoaded() {
-        D.log('AccountSheetHook.onSmartsheetLoaded');
         this.initSmartsheetHooks();
     }
 

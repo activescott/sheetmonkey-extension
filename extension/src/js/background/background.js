@@ -11,7 +11,6 @@ class Background {
     constructor() {
         const handlers = {
             getRegisteredPlugins: (done) => {
-                D.log('getRegisteredPlugins message');
                 bg.getRegisteredPluginsImpl().then(pluginRegistry => {
                     D.log('pluginRegistry:', pluginRegistry);
                     done(pluginRegistry);
