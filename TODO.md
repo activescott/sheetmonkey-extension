@@ -37,11 +37,11 @@
 
 
 # FUTURE #
-* ssfsf
-* fix the plugins insertion speed on the menu. Use retries instead of delay.
-* Sheet Command (permalink)
-* Row Command (permalink)
-* Col Command (json)
+* fix the plugins insertion speed on the menu.
+    * Use DomUtil.lazyQuerySelector to wait for the menu and trigger hooks. No more click monitoring and delays.
+* Sheet Command (copy permalink to clipboard)
+* Row Command (copy permalink to clipboard)
+* Col Command (get json)
 * Col Indicators
-* Row indicators?
+* Row indicators
 * SheetMonkeyHost.toast - Displays a toast message to the user with text.

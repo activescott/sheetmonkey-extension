@@ -16,7 +16,7 @@ Don't have a plugin? See Creating Plugins below!
 ## Compiling & Debugging ##
 1. Go to the root and run `npm install` (or `yarn`) to install dependencies.
 2. Run `./extension/dev.sh` to build it in development mode. It will build and put output in `/build/dev` (using webpack watch to keep the js up to date).
-3. Visit [chrome://extensions/](chrome://extensions/), ensure *Developer mode* is checked and use *Load unpacked extension* to load the extension from `/build/dev`.
+3. Visit [chrome://extensions/](chrome://extensions/), ensure *Developer mode* is checked and use *Load unpacked extension* to load the extension from `./build/dev`.
 
 
 ## Creating Plugins ##
