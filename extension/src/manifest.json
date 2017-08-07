@@ -11,5 +11,13 @@
   "web_accessible_resources": [ "js/sheetMonkeyHost.js" ],
   "name": "<%= package.name %>",
   "version": "<%= package.version %>",
-  "description": "<%= package.description %>"
+  "description": "<%= package.description %>",
+  "externally_connectable": {
+    // Match patterns for web pages. Does not affect content scripts.
+    // If this field is not specified, no webpages can connect.
+    "matches": [
+      "https://*.sheetmonkey.com/*",
+      "http://localhost:8111/*"
+    ]
+  }
 }

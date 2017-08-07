@@ -37,6 +37,8 @@ Plugins can expose the following capabilities:
     * Custom cell renderers (via formulas functions)
         * Markdown, sparklines, etc.
     * Keyboard shortcuts
+        * refresh
+    * Interactive multi-person edit cursors
 
 ### Manifest Format ###
 Below is a commented manifest (note comments aren't allowed in the actual JSON though).

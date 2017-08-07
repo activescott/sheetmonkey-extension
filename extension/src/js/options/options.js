@@ -1,6 +1,5 @@
 import Promise from 'bluebird';
 import $ from 'jquery';
-import msg from '../modules/msg';
 import Storage from '../modules/storage';
 import Diag from '../modules/diag';
 
@@ -11,14 +10,6 @@ class Opt {
     constructor() {
         this.load();
         this.listen();
-        this.messenger = msg.init('options', {
-            loadPluginUrls: (done) => {
-                D.log('loadPluginUrls message received!');
-                Storage.loadUrls().then(urls => {
-                    done(urls);
-                });
-            }
-        });
     }
 
     listen() {

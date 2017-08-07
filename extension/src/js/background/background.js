@@ -21,7 +21,7 @@ class Background {
     }
 
     /**
-     * Returns a promise who will return an array of registered plugins.
+     * Returns a promise that will resolve to an array of registered plugins.
      */
     getRegisteredPluginsImpl() {
         return Storage.loadPluginUrls().then(urls => {
