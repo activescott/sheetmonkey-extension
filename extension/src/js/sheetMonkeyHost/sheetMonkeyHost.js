@@ -38,10 +38,6 @@ class SheetMonkeyHost {
             return;
         }
         let msg = event.data;
-        if (msg.pluginId != this._pluginId) {
-            D.error('Unexpected pluginId', msg.pluginId, 'Expected', this._pluginId);
-            return;
-        }
         for (var handler of this._receiveMessageHandlers) {
             handler.tryReceiveMessage(event);
         }

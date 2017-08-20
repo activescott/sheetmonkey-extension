@@ -60,7 +60,7 @@ class Background {
           let plugin = {};
           plugin.manifestUrl = url;
           plugin.baseUrl = Background.parseBaseUrl(url);
-          plugin.manifest = Background.sanitizeManifest(manifest);
+          plugin.manifest = Background.sanitizeManifest(url, manifest);
           return plugin;
         });
       }).then(plugins => {
@@ -91,9 +91,9 @@ class Background {
     });
   }
 
-  static sanitizeManifest(manifest) {
+  static sanitizeManifest(url, manifest) {
     let m = Object.assign({}, manifest);
-    m.id = Background.encodeIdent(m.id);
+    m.id = Background.encodeIdent(url);
     if (m.commands) {
       m.commands = m.commands.map(c => {
         return {
