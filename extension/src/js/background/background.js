@@ -29,7 +29,6 @@ class Background {
       loadPluginsFromManifestUrls: function loadPluginsFromManifestUrls (request, sender, sendResponse) {
         console.assert(request && request.hasOwnProperty('sheetmonkey'), 'expected request to have sheetmonkey prop')
         console.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
-        console.assert(typeof request.sheetmonkey.params === 'object' && request.sheetmonkey.params.hasOwnProperty('length'), 'expected params to be array')
         console.assert(typeof request.sheetmonkey.params.hasOwnProperty('manifestUrls'), 'expected manifestUrls prop!')
         let urls = request.sheetmonkey.params.manifestUrls
         SheetmonkeyUtil.loadPluginsFromManifestUrls(urls).then(plugins => {
@@ -37,6 +36,27 @@ class Background {
           sendResponse(plugins)
         })
         return true// this indicates our response is forthcoming...
+      },
+      installPlugin: function installPlugin (request, sender, sendResponse) {
+        console.assert(request && request.hasOwnProperty('sheetmonkey'), 'expected request to have sheetmonkey prop')
+        console.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
+        console.assert(typeof request.sheetmonkey.params.hasOwnProperty('manifestUrl'), 'expected manifestUrls prop!')
+        const manifestUrl = request.sheetmonkey.params.manifestUrl
+        if (window.confirm(`You are about to install a plugin from '${manifestUrl}'. You should only install plugins from a trusted source. Click OK to install it, or Cancel to Cancel installing this plugin.`)) {
+          Storage.loadPluginUrls().then(loadedUrls => {
+            if (loadedUrls.findIndex(url => url.toLowerCase() == manifestUrl.toLowerCase()) === -1) {
+              loadedUrls.push(manifestUrl)
+              Storage.savePluginUrls(loadedUrls).then(() => {
+                D.log('plugin installed.')
+                sendResponse(true)
+              })
+            } else {
+              D.log(`Plugin '${manifestUrl} already installed.`)
+              sendResponse(false) 
+            }
+          });
+        }
+        return true// this indicates our response is forthcoming... (and we want the client to be able to know when we're done so they can refresh)
       }
     }
     // SEE https://developer.chrome.com/extensions/messaging

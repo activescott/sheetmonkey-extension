@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 
 class DomUtil {
   /**
-   * Returns a Promise of the result of the specified DOM query.
+   * Monitors the DOM for elements that match the specified query. If/when the query has a match the Promise will be resolved with the matching nodes.
    * @param {*Array} queries An array of string queries or a string query that can be fed to docuemnt.querySelector to find the desired nodes. If there is more than one element in the array any of the queries that succeed will fulfill and resolve the promise.
    */
   static lazyQuerySelector(queries) {
