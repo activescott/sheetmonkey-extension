@@ -3,6 +3,7 @@ import $ from 'jquery';
 import SheetHook from './sheetHook.js';
 import Constants from '../modules/Constants.js';
 import Diag from '../modules/diag.js';
+import DomUtil from '../modules/DomUtil.js';
 
 const D = new Diag('AccountSheetHook');
 
@@ -23,10 +24,35 @@ class AccountSheetHook extends SheetHook {
             // if the click is on a command, it will be dispatched here:
             var handled = this.handleCommandEvent(e);
             if (!handled) {
-                // every time something is clicked, we'll attempt to init commands. We have to wait because menus don't exist in dom until a click.
-                this.initCommands();
+                // every time something is clicked, it could have closed the account menu. If there is no account menu present, we'll hookup a new query selector:
+                if (this.activeAccountMenuListener == null) {
+                    // no current listener...
+                    let acctMenu = this.getAccountMenuElement()
+                    if (acctMenu.length == 0) {
+                        // no account menu in DOM:
+                        this.setupAccountMenuListener()
+                    }
+                }
             }
         });
+        this.setupAccountMenuListener()
+    }
+
+    setupAccountMenuListener() {
+        this.activeAccountMenuListener = DomUtil.lazyQuerySelector(this.accountMenuElementSelectorStandard).then(() => {
+            this.activeAccountMenuListener = null
+            // account menu appeared:
+            this.initAccountMenuCommands()
+        })
+    }
+
+    get accountMenuElementSelectorStandard() {
+        return 'div.clsPopupMenu tr[data-client-id="10727"]'
+    }
+
+    get accountMenuElementSelectorJQuery() {
+        // NOTE: the has: selector is a jquery extension that doesn't work with lazyQuerySelector.
+        return 'div.clsPopupMenu:has(tr[data-client-id="10727"])'
     }
 
     /**
@@ -58,63 +84,34 @@ class AccountSheetHook extends SheetHook {
     }
 
     getAccountMenuElement() {
-        var accountMenu = $('div.clsPopupMenu:has(tr[data-client-id="10727"])');
+        var accountMenu = $(this.accountMenuElementSelectorJQuery);
         return accountMenu;
     }
 
-    /**
-     * Returns Promise<Boolean> if the account menu commands should be injected/initialized.
-     */
-    shouldInitAccountMenuCommands() {
-        //TODO: setup a much shorter delay and retry it a few times.
-        //delay 500ms to give the account menu a chance to get into the DOM
-        return Promise.delay(500).then(() => {
-            var shouldInit = false;
-            // get the account menu table:
-            var accountMenu = this.getAccountMenuElement();
-            if (accountMenu.length > 0) {
-                // does the account menu already have plugins:
-                var foundCommands = accountMenu.has('.' + Constants.commandClassName);
-                //if (foundCommands.length > 0) this.log('Account menu already has SheetMonkey commands.');
-                shouldInit = foundCommands.length == 0;
-            }
-            else {
-                D.log('Account menu not found.');
-                shouldInit = false;
-            }
-            return shouldInit;
-        });
-    }
-
     initAccountMenuCommands() {
-        return this.shouldInitAccountMenuCommands().then(shouldInit => {
-            if (!shouldInit) {
-                return
-            }
-            var signOutMenuItem = $('tr[data-client-id="10727"]');
-            if (signOutMenuItem.length == 0) {
-                D.warn('initAccountMenuCommands: Smartsheet "Sign Out" menu item NOT found!');
-                return;
-            }
-            var placeHolderElement = null;
-            for (var p of this.plugins) {
-                for (var c of p.manifest.commands) {
-                    if (c.kind == Constants.account_menu) {
-                        D.log('initializing command ', c);
-                        if (placeHolderElement==null) {
-                            // no elements inserted yet...
-                            placeHolderElement = this.getMenuDivider();
-                            signOutMenuItem.after(placeHolderElement);
-                            placeHolderElement = placeHolderElement[1];// hack it returns two elements and we want the second one.
-                        }
-                        var menuItem = this.getMenuElement(p.manifest.id, c.id, c.label);
-                        placeHolderElement.after(menuItem);
-                        placeHolderElement = menuItem;
+        var signOutMenuItem = $('tr[data-client-id="10727"]');
+        if (signOutMenuItem.length == 0) {
+            D.warn('initAccountMenuCommands: Smartsheet "Sign Out" menu item NOT found!');
+            return;
+        }
+        var placeHolderElement = null;
+        for (var p of this.plugins) {
+            for (var c of p.manifest.commands) {
+                if (c.kind == Constants.account_menu) {
+                    D.log('initializing command ', c);
+                    if (placeHolderElement==null) {
+                        // no elements inserted yet...
+                        placeHolderElement = this.getMenuDivider();
+                        signOutMenuItem.after(placeHolderElement);
+                        placeHolderElement = placeHolderElement[1];// hack it returns two elements and we want the second one.
                     }
+                    var menuItem = this.getMenuElement(p.manifest.id, c.id, c.label);
+                    placeHolderElement.after(menuItem);
+                    placeHolderElement = menuItem;
                 }
             }
-            this.initCommandEvents();
-        });
+        }
+        this.initCommandEvents();
     }
 
     initCommandEvents() {
