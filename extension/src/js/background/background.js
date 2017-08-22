@@ -42,7 +42,7 @@ class Background {
         console.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
         console.assert(typeof request.sheetmonkey.params.hasOwnProperty('manifestUrl'), 'expected manifestUrls prop!')
         const manifestUrl = request.sheetmonkey.params.manifestUrl
-        if (window.confirm(`You are about to install a plugin from '${manifestUrl}'. You should only install plugins from a trusted source. Click OK to install it, or Cancel to Cancel installing this plugin.`)) {
+        if (window.confirm(`You are about to install a plugin from '${manifestUrl}'. You should only install plugins from a trusted source. Click OK to install it, or Cancel to cancel installing this plugin.`)) {
           Storage.loadPluginUrls().then(loadedUrls => {
             if (loadedUrls.findIndex(url => url.toLowerCase() == manifestUrl.toLowerCase()) === -1) {
               loadedUrls.push(manifestUrl)
@@ -57,6 +57,28 @@ class Background {
           });
         }
         return true// this indicates our response is forthcoming... (and we want the client to be able to know when we're done so they can refresh)
+      },
+      uninstallPlugin: function uninstallPlugin (request, sender, sendResponse) {
+        console.assert(request && request.hasOwnProperty('sheetmonkey'), 'expected request to have sheetmonkey prop')
+        console.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
+        console.assert(typeof request.sheetmonkey.params.hasOwnProperty('manifestUrl'), 'expected manifestUrls prop!')
+        const manifestUrl = request.sheetmonkey.params.manifestUrl
+        if (window.confirm(`Are you sure that you want to uninstall the plugin from '${manifestUrl}'? Click OK to uninstall it, or Cancel to cancel.`)) {
+          Storage.loadPluginUrls().then(loadedUrls => {
+            const foundIndex = loadedUrls.findIndex(url => url.toLowerCase() == manifestUrl.toLowerCase())
+            if (foundIndex >= 0) {
+              loadedUrls.splice(foundIndex, 1)
+              Storage.savePluginUrls(loadedUrls).then(() => {
+                D.log('plugin uninstalledinstalled.')
+                sendResponse(true)
+              })
+            } else {
+              D.log(`Plugin '${manifestUrl} not installed.`)
+              sendResponse(false) 
+            }
+          });
+        }
+        return true// this indicates our response is forthcoming...
       }
     }
     // SEE https://developer.chrome.com/extensions/messaging
