@@ -55,7 +55,7 @@ class SheetmonkeyUtil {
   }
 
   static encodeIdent (ident) {
-    return ident.replace(/[^A-Za-z0-9_.]/g, '_')
+    return ident.replace(/[^A-Za-z0-9]/g, '_')
   }
 
   /**

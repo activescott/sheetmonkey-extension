@@ -39,10 +39,21 @@
     "mocha": "^3.5.0",
     "mocha-webpack": "^0.7.0",
     "sinon": "^3.0.0",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3",
     "webpack": "^3.4.1",
     "webpack-dev-server": "^2.6.1",
     "webpack-node-externals": "^1.6.0",
     "webpack-version-file-plugin": "^0.2.3"
   },
-  "export-symbol": "extensionSkeleton.exports"
+  "export-symbol": "extensionSkeleton.exports",
+  "standard.options": {
+    "globals": [],
+    "ignore": [
+        "node_modules/**"
+    ],
+    "plugins": ["html"],
+    "parser": "babel-eslint"
+}
+
 }

@@ -1,44 +1,41 @@
-import Promise from 'bluebird';
-import $ from 'jquery';
-import Diag from '../modules/diag.js';
-const D = new Diag('SheetHook');
+'use strict'
+import $ from 'jquery'
 
 class SheetHook {
-    constructor(pluginHost, plugins, document) {
-        if (pluginHost== null || plugins==null || document==null) {
-            throw new Error('missing arguments');
-        }
-        this._pluginHost = pluginHost;
-        this._plugins = plugins;
-        this._document = document;
-        this.initDocumentListeners();
+  constructor (pluginHost, plugins, document) {
+    if (pluginHost == null || plugins == null || document == null) {
+      throw new Error('missing arguments')
     }
+    this._pluginHost = pluginHost
+    this._plugins = plugins
+    this._document = document
+    this.initDocumentListeners()
+  }
 
-    initDocumentListeners() {
-        // Should we be doing this via this.doc instead? Jquery seems to find the document ok and is more resilient.
-        $(() => {
-            this.onSmartsheetLoaded();
-        });
-    }
+  initDocumentListeners () {
+    // Should we be doing this via this.doc instead? Jquery seems to find the document ok and is more resilient.
+    $(() => {
+      this.onSmartsheetLoaded()
+    })
+  }
 
-    get doc() {
-        return this._document;
-    }
+  get doc () {
+    return this._document
+  }
 
-    get pluginHost() {
-        return this._pluginHost;
-    }
+  get pluginHost () {
+    return this._pluginHost
+  }
 
-    get plugins() {
-        return this._plugins;
-    }
+  get plugins () {
+    return this._plugins
+  }
 
-    /**
-     * Triggered when the document for Smartsheet is loaded and available.
-     */
-    onSmartsheetLoaded () {
-        D.log('onSmartsheetLoaded');
-    }
+  /**
+  * Triggered when the document for Smartsheet is loaded and available.
+  */
+  onSmartsheetLoaded () {
+  }
 }
 
-export default SheetHook;
+export default SheetHook
