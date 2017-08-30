@@ -6,7 +6,7 @@ SheetMonkey
 
 
 ## Installation ##
-For now you have to compile it (see below).
+For now you have to compile it (see below) or visit https://chrome.google.com/webstore/detail/gdnefhegodkfgopmjacoenelkfkbkkdg
 
 ## Usage ##
 After you install the plugin, go to the Options page for the plugin (find SheetMonkey in [chrome://extensions/](chrome://extensions/) and click *Options*) and enter the URL for your favorite plugin's manifest (such as http://localhost:8100/ssfjmanifest.json).

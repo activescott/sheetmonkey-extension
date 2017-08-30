@@ -29,25 +29,6 @@ module.exports = _.merge({}, config, {
       template: path.resolve(__dirname, '../src/manifest.json'),
       outputFile: path.resolve(__dirname, '../build/prod/manifest.json'),
     }),
-    new CrxPlugin({
-      keyFile: '../mykey.pem',
-      contentPath: '../build/prod',
-      outputPath: '../build',
-      name: appName
-    }),
-    new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }),
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        screw_ie8: true,
-        warnings: false
-      },
-      mangle: {
-        screw_ie8: true
-      },
-      output: {
-        comments: false,
-        screw_ie8: true
-      }
-    }),
+    new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' })
   ]
 });

@@ -37,9 +37,10 @@
 
 
 # FUTURE #
-* fix the plugins insertion speed on the menu.
-    * Use DomUtil.lazyQuerySelector to wait for the menu and trigger hooks. No more click monitoring and delays.
-* Sheet Command (copy permalink to clipboard)
+* Add https://developer.chrome.com/apps/analytics to extension /store listing
+* - [x] fix the plugins insertion speed on the menu.
+    - Use DomUtil.lazyQuerySelector to wait for the menu and trigger hooks. No more click monitoring and delays.
+- [ ] Sheet Command (copy permalink to clipboard)
 * Row Command (copy permalink to clipboard)
 * Col Command (get json)
 * Col Indicators

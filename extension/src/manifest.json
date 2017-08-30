@@ -1,6 +1,11 @@
 {
   "manifest_version": 2,
-  "icons": { "128": "images/icon.png" },
+  "icons": {
+    "128": "images/monkey128.png",
+    "64": "images/monkey64.png",
+    "32": "images/monkey32.png",
+    "16": "images/monkey16.png"
+  },
   "background": { "scripts": ["js/background.js"] },
   "content_scripts": [{
     "matches": [ "https://app.smartsheet.com/*" ],
@@ -13,8 +18,6 @@
   "version": "<%= package.version %>",
   "description": "<%= package.description %>",
   "externally_connectable": {
-    // Match patterns for web pages. Does not affect content scripts.
-    // If this field is not specified, no webpages can connect.
     "matches": [
       "https://*.sheetmonkey.com/*",
       "http://localhost:8111/*"
