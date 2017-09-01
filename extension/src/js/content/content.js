@@ -20,7 +20,7 @@ function initPlugins () {
       cmd: 'getRegisteredPlugins'
     }
   }, response => {
-    D.log('response from getResigeredPlugins:', response)
+    D.log('response from getRegisteredPlugins:', response)
     const registeredPlugins = response
       // host the plugins inside the app's window (as iframes).
     pluginHost = new PluginHost(document, registeredPlugins)

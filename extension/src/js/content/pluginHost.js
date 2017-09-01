@@ -1,4 +1,4 @@
-'use strict' /* global chrome */
+'use strict' /* global chrome, window */
 import $ from 'jquery'
 import Constants from '../modules/Constants.js'
 import Diag from '../modules/diag.js'
@@ -34,6 +34,7 @@ class PluginHost {
             // note: relying on jquery to safely encode all these unsafe strings
       let scripts = urls.map(u => $('<script>').attr('src', u))
       scripts.unshift(`<script>window.data_sheetmonkey_pluginid="${plugin.manifest.id}"</script>`)
+      scripts.unshift(`<script>window.data_sheetmonkey_ssOrigin="${window.origin}"</script>`)
       let html = $('<html>').append(scripts)
       let srcDoc = html.prop('outerHTML')
       let iframe = $('<iframe sandbox="allow-scripts allow-modals allow-popups allow-forms allow-popups-to-escape-sandbox" style="display:none"></iframe>')

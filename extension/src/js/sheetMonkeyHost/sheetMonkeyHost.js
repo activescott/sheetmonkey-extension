@@ -17,7 +17,9 @@ class SheetMonkeyHost {
     if (!options) throw new Error('options missing')
     if (!options.commandHandler) throw new Error('commandHandler missing')
     this._pluginId = window.data_sheetmonkey_pluginid
+    this._ssOrigin = window.data_sheetmonkey_ssOrigin
     D.log('Found my pluginid as', this._pluginId)
+    D.log('Found ss origin as', this._ssOrigin)
     this._commandHandler = options.commandHandler
     this._receiveMessageHandlers = [new CommandClickHandler(this)]
   }
@@ -28,7 +30,7 @@ class SheetMonkeyHost {
   */
   receiveMessage (event) {
     D.log('receiveMessage:', event)
-    if (event.origin !== 'https://app.smartsheet.com') {
+    if (['https://app.smartsheet.com', 'https://mars.lab.smartsheet.com'].indexOf(event.origin) < 0) {
       D.log('Ignoring message from untrusted origin:', event.origin)
       return
     }
@@ -49,7 +51,7 @@ class SheetMonkeyHost {
 
   postMessageToSheetMonkey (message) {
     // TODO: Consider having extension provide a signed secret to this script to provide back to the extension during communication.
-    const targetOrigin = 'https://app.smartsheet.com'
+    const targetOrigin = this._ssOrigin
     window.parent.postMessage(message, targetOrigin)
   }
 

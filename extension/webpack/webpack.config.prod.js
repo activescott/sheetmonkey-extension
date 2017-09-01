@@ -28,6 +28,7 @@ module.exports = _.merge({}, config, {
       packageFile: path.resolve(__dirname, '../package.json'),
       template: path.resolve(__dirname, '../src/manifest.json'),
       outputFile: path.resolve(__dirname, '../build/prod/manifest.json'),
+      extras: { build_env: '' }
     }),
     new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' })
   ]

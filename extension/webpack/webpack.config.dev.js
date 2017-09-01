@@ -23,6 +23,7 @@ module.exports = _.merge({}, config, {
       packageFile: path.resolve(__dirname, '../package.json'),
       template: path.resolve(__dirname, '../src/manifest.json'),
       outputFile: path.resolve(__dirname, '../build/dev/manifest.json'),
+      extras: { build_env: ' dev' }
     })
   ],
   watch: true
