@@ -90,6 +90,23 @@ class SheetMonkeyHost {
     this.postMessageToSheetMonkey(msg)
     return p
   }
+
+  launchAuthFlow () {
+    D.log('launchAuthFlow')
+    var resolver
+    var rejecter
+    let p = new Promise((resolve, reject) => {
+      resolver = resolve
+      rejecter = reject
+    })
+    this._receiveMessageHandlers.push(new LaunchAuthFlowResponseHandler(resolver, rejecter))
+    let msg = {
+      eventType: Constants.messageLaunchAuthFlow,
+      pluginId: this._pluginId
+    }
+    this.postMessageToSheetMonkey(msg)
+    return p
+  }
 }
 
 class ReceiveMessageHandler {
@@ -111,13 +128,14 @@ class ReceiveMessageHandler {
 class CommandClickHandler extends ReceiveMessageHandler {
   constructor (sheetMonkeyHost) {
     super(sheetMonkeyHost)
-    if (!sheetMonkeyHost)
-      {throw new Error('argument required');}
+    if (!sheetMonkeyHost) {
+      throw new Error('argument required')
+    }
     this._host = sheetMonkeyHost
   }
   tryReceiveMessage (event) {
     let msg = event.data
-    if (msg.eventType && msg.eventType == 'command_click') {
+    if (msg.eventType && msg.eventType === 'command_click') {
       const cmdInfo = {
         eventType: msg.eventType,
         pluginId: msg.pluginId,
@@ -166,6 +184,18 @@ class GetSelectionInfoResponseHandler extends ResponseHandler {
     let msg = event.data
     if (msg.eventType && msg.eventType === Constants.messageGetSelectionInfoResponse) {
       D.assert(msg.hasOwnProperty('rowID'), `Expected msg ${msg.eventType} to have rowID`)
+      this.resolve(msg) // <- Resolves the promise provided in the sheetmonkeyhost method.
+      return true
+    }
+    return false
+  }
+}
+
+class LaunchAuthFlowResponseHandler extends ResponseHandler {
+  tryReceiveMessage (event) {
+    let msg = event.data
+    if (msg.eventType && msg.eventType === Constants.messageLaunchAuthFlowResponse) {
+      // TODO: assert something... D.assert(msg.hasOwnProperty('rowID'), `Expected msg ${msg.eventType} to have rowID`)
       this.resolve(msg) // <- Resolves the promise provided in the sheetmonkeyhost method.
       return true
     }

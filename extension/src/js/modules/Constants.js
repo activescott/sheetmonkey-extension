@@ -24,6 +24,16 @@ class Constants {
   static get messageGetSelectionInfoResponse () {
     return 'messageGetSelectionInfoResponse'
   }
+  static get messageLaunchAuthFlow () {
+    return 'messageLaunchAuthFlow'
+  }
+  static get messageLaunchAuthFlowResponse () {
+    return 'messageLaunchAuthFlowResponse'
+  }
+  /** Sent by background to contentscript to get active users' email */
+  static get messageGetUserEmail () {
+    return 'messageGetUserEmail'
+  }
 }
 
 export default Constants

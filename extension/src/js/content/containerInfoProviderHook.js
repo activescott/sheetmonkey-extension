@@ -1,4 +1,4 @@
-'use string' /* global MouseEvent */
+'use strict' /* global MouseEvent */
 import Promise from 'bluebird'
 import $ from 'jquery'
 import SheetHook from './SheetHook.js'
