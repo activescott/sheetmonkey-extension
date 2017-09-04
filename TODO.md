@@ -19,10 +19,10 @@
       * Extension catches the URL, extracts token from URL and saves token for that plugin (and user combo).
       * Later plugin can ask extension to call the API (extension gets around CORS) with a special API request (<verb> <relative_api_path>) and payload data. Extension will add appropriate auth header.
     - TASKS:
-      - [ ] Server: Allow devs to register client id, client secret, and redirect URL in sheetmonkey.com.
-      - [ ] Server: Setup auth endpoint that extension can use for authflow.
-        - [ ] Input is [pluginid, extension_redirect_uri], uses that to fetch clientid and redirect to ss.com auth endpoint. State=jwt of extension_redirect_uri.
-        - [ ] Upon auth, user is redirected back to sheetmonkey-server and he catches the code and uses plugin's registered client secret to get tokens and redirects to extension.
+      - [x] Server: Allow devs to register client id, client secret, and redirect URL in sheetmonkey.com.
+      - [x] Server: Setup auth endpoint that extension can use for authflow.
+        - [x] Input is [pluginid, extension_redirect_uri], uses that to fetch clientid and redirect to ss.com auth endpoint.
+        - [x] Upon auth, user is redirected back to sheetmonkey-server and he catches the code and uses plugin's registered client secret to get tokens and redirects to extension.
         - [ ] Extension: Catches tokens, saves them
         - [ ] Extension: When plugin reqeusts API operation, he uses saved tokens to auth API requests.
       

@@ -20,6 +20,7 @@ class AuthenticationHook extends SheetHook {
       if (msg.pluginId) {
         return this.launchAuthFlow(msg.pluginId).then(authInfo => {
           D.log('authInfo:', authInfo)
+          if (!authInfo) authInfo = {}
           authInfo.eventType = Constants.messageLaunchAuthFlowResponse
           this.pluginHost.postMessageToPlugin(msg.pluginId, authInfo)
         })

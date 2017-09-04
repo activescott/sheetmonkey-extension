@@ -18,7 +18,8 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "jquery": "^3.2.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
@@ -50,10 +51,11 @@
   "standard.options": {
     "globals": [],
     "ignore": [
-        "node_modules/**"
+      "node_modules/**"
     ],
-    "plugins": ["html"],
+    "plugins": [
+      "html"
+    ],
     "parser": "babel-eslint"
-}
-
+  }
 }

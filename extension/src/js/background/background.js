@@ -5,6 +5,7 @@ import SheetmonkeyUtil from './SheetmonkeyUtil'
 import Diag from '../modules/diag.js'
 import $ from 'jquery'
 import Constants from '../modules/Constants.js'
+import urlmod from 'url'
 
 const D = new Diag('bg-script')
 
@@ -89,27 +90,61 @@ class Background {
         D.assert(request && request.hasOwnProperty('sheetmonkey'), 'expected request to have sheetmonkey prop')
         D.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
         D.assert(typeof request.sheetmonkey.params.hasOwnProperty('pluginId'), 'expected pluginId prop!')
+        // TODO: DON'T TRUST THIS pluginId WE NEED PLUGINS TO SIGN THEIR REQUESTS TO EXTENSION!
         const pluginId = request.sheetmonkey.params.pluginId
+        const scope = ('scope' in request.sheetmonkey.params && request.sheetmonkey.params.scopes) || 'READ_SHEETS'
 
-        // First get the email address from the tab that sent us this request
-        this.getEmailAddress(sender.tab.id).then(email => {
-          D.log('email address:', email)
-          // Launch the auth flow
-          const flowDetails = {
-            url: 'https://beta.sheetmonkey.com/api/pluginauthflow?' +
-            $.param({
-              pluginId: pluginId,
-              scope: 'SCOPE',
-              redirect_uri: this.getRedirectUri(pluginId)
-            }),
-            interactive: true
+        // ensure that the pluginId has a clientID:
+        this.getRegisteredPluginsImpl().then(pluginRegistry => {
+          D.log('pluginRegistry:', pluginRegistry)
+          const plugin = pluginRegistry.find(p => p.manifest.id === pluginId)
+          if (!plugin) {
+            throw new Error(`plugin with pluginId "${pluginId}" not found.`)
           }
-          chrome.identity.launchWebAuthFlow(flowDetails, flowResult => {
-            D.log('chrome flowResult:', flowResult)
-            sendResponse(flowResult)
+          if (!plugin.manifest.apiClientID) {
+            throw new Error(`plugin with pluginId "${pluginId}" does not have a clientID. Ensure that apiClientID is in the published manifest.`)
+          }
+          // Get the email address from the tab that sent us this request
+          this.getEmailAddress(sender.tab.id).then(email => {
+            /** Launch the auth flow:
+             *  We first launch them directly to Smartsheet (https://smartsheet-platform.github.io/api-docs/#request-authorization-from-the-user)
+             *  After they auth, they will be redirected to sheetmonkey.com, who will get a token (using the secret)
+             *  sheetmonkey.com sends them back to us and we catch the token in the URL below:
+             */
+            const flowDetails = {
+              url: 'https://app.smartsheet.com/b/authorize?' +
+              $.param({
+                response_type: 'code',
+                client_id: plugin.manifest.apiClientID,
+                scope: scope,
+                state: chrome.i18n.getMessage('@@extension_id')
+              }),
+              interactive: true
+            }
+            D.log('flowDetails:', flowDetails)
+            chrome.identity.launchWebAuthFlow(flowDetails, flowResult => {
+              D.log('chrome flowResult:', flowResult)
+              // flowResult is a URL, parse out the tokenInfo querystring
+              const urlFlowResult = urlmod.parse(flowResult, true)
+              if (!('tokenInfo' in urlFlowResult.query)) {
+                throw new Error('Missing tokenInfo in auth flow result')
+              }
+
+              const jwtWithToken = urlFlowResult.query.tokenInfo
+              /** jwtWithToken has the following relevant claims in it:
+               * - access_token: SS API Access Token
+               * - expires_at: Time that the accesstoken expires.
+               * - prn: The SS users' User ID for the user who just authorized.
+               * - prneml: The SS users' email address for the user who just authorized.
+              */
+              // TODO: Validate signature on jwtWithToken
+
+              // TODO: Save token in storage for this pluginid and this user id.
+
+              sendResponse({jwt: jwtWithToken})
+            })
           })
         })
-
         return true
       }
     }
