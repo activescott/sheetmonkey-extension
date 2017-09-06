@@ -51,7 +51,6 @@ function getUserEmail () {
   return Promise.try(() => {
     // we're pulling email from bottom left corner (alternatively we could get it from Sign-out menu too):
     return DomUtil.lazyQuerySelector('div.clsDesktopFooter.clsTextOnDesktopColor > div:first-child').then(div => {
-      D.log('getUserEmail found:', div)
       return div.innerText
     })
   })

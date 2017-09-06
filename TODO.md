@@ -23,8 +23,9 @@
       - [x] Server: Setup auth endpoint that extension can use for authflow.
         - [x] Input is [pluginid, extension_redirect_uri], uses that to fetch clientid and redirect to ss.com auth endpoint.
         - [x] Upon auth, user is redirected back to sheetmonkey-server and he catches the code and uses plugin's registered client secret to get tokens and redirects to extension.
-        - [ ] Extension: Catches tokens, saves them
-        - [ ] Extension: When plugin reqeusts API operation, he uses saved tokens to auth API requests.
+        - [x] Extension: Catches tokens, saves them
+        - [ ] Extension: Expose an api to plugins to call api: ssapi(httpMethod, operationPath, headers, data)
+            - When plugin reqeusts API operation, he uses saved tokens to auth API requests.
       
       - Later:
         - [ ] Token Refresh: To refresh tokens, sheetmonkey.com can just provide the service. Give the exntesion the refresh token too and let him manage it. Or ignore it, and when the token expires just spin up another auth flow.

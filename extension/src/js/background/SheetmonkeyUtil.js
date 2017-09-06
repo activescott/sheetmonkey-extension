@@ -1,6 +1,7 @@
-/* global XMLHttpRequest */
+'use strict'
 import Promise from 'bluebird'
-import Diag from '../modules/diag.js'
+import Diag from '../modules/diag'
+import Xhr from '../modules/Xhr'
 
 const D = new Diag('SheetmonkeyUtil')
 
@@ -14,7 +15,7 @@ class SheetmonkeyUtil {
    */
   static loadPluginsFromManifestUrls (pluginManifestUrls) {
     return Promise.map(pluginManifestUrls, url => {
-      return SheetmonkeyUtil.xhrGetJSON(url).catch(e => {
+      return Xhr.getJSON(url).catch(e => {
         // NOTE: Just log and ignore, don't don't throw. We'll recover by adding a null into the promise chain
         D.error(`Failed to get JSON manifest from url '${url}'. Error: ${e}`)
         return null
@@ -56,27 +57,6 @@ class SheetmonkeyUtil {
 
   static encodeIdent (ident) {
     return ident.replace(/[^A-Za-z0-9]/g, '_')
-  }
-
-  /**
-   * Returns JSON from the specified URL as a promise.
-   */
-  static xhrGetJSON (url) {
-    return new Promise((resolve, reject) => {
-      var xhr = new XMLHttpRequest()
-      xhr.open('GET', url, true)
-      xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) {
-          if (xhr.status < 200 || xhr.status >= 300) { return reject(new Error(`Server at url '${url}' returned error status '${xhr.status}'. StatusText: '${xhr.statusText}'`)) }
-          try {
-            return resolve(JSON.parse(xhr.responseText))
-          } catch (e) {
-            return reject(new Error(`Failed to parse JSON from url '${url}'. Error: ${e}\n Response was: '${xhr.responseText}'`))
-          }
-        }
-      }
-      xhr.send()
-    })
   }
 }
 

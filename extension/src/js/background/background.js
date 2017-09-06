@@ -1,11 +1,16 @@
-'use strict' /* global chrome */
+/* global chrome */
+'use strict'
 import Promise from 'bluebird'
 import Storage from '../modules/storage'
 import SheetmonkeyUtil from './SheetmonkeyUtil'
-import Diag from '../modules/diag.js'
+import Diag from '../modules/diag'
 import $ from 'jquery'
-import Constants from '../modules/Constants.js'
+import Constants from '../modules/Constants'
 import urlmod from 'url'
+import JwtHelper from '../modules/JwtHelper'
+import Promisifier from '../modules/Promisifier'
+
+const chromeIdentity = Promisifier.promisifyChromeApi(chrome.identity)
 
 const D = new Diag('bg-script')
 
@@ -94,7 +99,7 @@ class Background {
         const pluginId = request.sheetmonkey.params.pluginId
         const scope = ('scope' in request.sheetmonkey.params && request.sheetmonkey.params.scopes) || 'READ_SHEETS'
 
-        // ensure that the pluginId has a clientID:
+        // ensure that the pluginId has a apiClientID:
         this.getRegisteredPluginsImpl().then(pluginRegistry => {
           D.log('pluginRegistry:', pluginRegistry)
           const plugin = pluginRegistry.find(p => p.manifest.id === pluginId)
@@ -105,11 +110,11 @@ class Background {
             throw new Error(`plugin with pluginId "${pluginId}" does not have a clientID. Ensure that apiClientID is in the published manifest.`)
           }
           // Get the email address from the tab that sent us this request
-          this.getEmailAddress(sender.tab.id).then(email => {
+          return this.getEmailAddress(sender.tab.id).then(email => {
             /** Launch the auth flow:
              *  We first launch them directly to Smartsheet (https://smartsheet-platform.github.io/api-docs/#request-authorization-from-the-user)
-             *  After they auth, they will be redirected to sheetmonkey.com, who will get a token (using the secret)
-             *  sheetmonkey.com sends them back to us and we catch the token in the URL below:
+             *  After they auth, they will be redirected to sheetmonkey-server with the code; server exchanges code for a token (using the secret)
+             *  sheetmonkey-server then redirects user back to us with the token and we catch the token in the URL below:
              */
             const flowDetails = {
               url: 'https://app.smartsheet.com/b/authorize?' +
@@ -122,28 +127,38 @@ class Background {
               interactive: true
             }
             D.log('flowDetails:', flowDetails)
-            chrome.identity.launchWebAuthFlow(flowDetails, flowResult => {
+            return chromeIdentity.launchWebAuthFlowAsync(flowDetails).then(flowResult => {
               D.log('chrome flowResult:', flowResult)
               // flowResult is a URL, parse out the tokenInfo querystring
               const urlFlowResult = urlmod.parse(flowResult, true)
               if (!('tokenInfo' in urlFlowResult.query)) {
                 throw new Error('Missing tokenInfo in auth flow result')
               }
-
               const jwtWithToken = urlFlowResult.query.tokenInfo
-              /** jwtWithToken has the following relevant claims in it:
+              /** jwtWithToken has the following relevant claims in it (as encoded by sheetmonkey-server)
                * - access_token: SS API Access Token
                * - expires_at: Time that the accesstoken expires.
                * - prn: The SS users' User ID for the user who just authorized.
                * - prneml: The SS users' email address for the user who just authorized.
+               * - aud: The manifest URL of the plugin that the token is for
               */
-              // TODO: Validate signature on jwtWithToken
-
-              // TODO: Save token in storage for this pluginid and this user id.
-
-              sendResponse({jwt: jwtWithToken})
+              // D.log('jwtWithToken:', jwtWithToken)
+              return JwtHelper.decode(jwtWithToken).then(claims => {
+                // D.log('claims:', claims)
+                return Storage.saveAccessTokenForPlugin(plugin.manifestUrl, email, jwtWithToken).then(() => {
+                  // let the plugin know we succeeded. If we didn't, a catch below should be hit and return an object that is `instanceof Error`
+                  sendResponse({success: true})
+                })
+              })
             })
           })
+        }).catch(jwtError => {
+          D.error('promise error:', jwtError)
+          // send an `instanceof Error` object as response
+          if (!(jwtError instanceof Error)) {
+            jwtError = new Error(jwtError)
+          }
+          sendResponse(jwtError)
         })
         return true
       }
