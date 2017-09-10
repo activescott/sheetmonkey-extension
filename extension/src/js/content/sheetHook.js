@@ -31,6 +31,14 @@ class SheetHook {
     return this._plugins
   }
 
+  getPluginManifestUrlFromID (pluginID) {
+    let plugin = this.plugins.find(p => p.manifest.id === pluginID)
+    if (!plugin) {
+      throw new Error(`manifestUrl not found for pluginID ${pluginID}`)
+    }
+    return plugin.manifestUrl
+  }
+
   /**
   * Triggered when the document for Smartsheet is loaded and available.
   */

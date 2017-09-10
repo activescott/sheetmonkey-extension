@@ -94,20 +94,20 @@ class Background {
         // TODO: Get this boilerplate shite out of here:
         D.assert(request && request.hasOwnProperty('sheetmonkey'), 'expected request to have sheetmonkey prop')
         D.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
-        D.assert(typeof request.sheetmonkey.params.hasOwnProperty('pluginId'), 'expected pluginId prop!')
-        // TODO: DON'T TRUST THIS pluginId WE NEED PLUGINS TO SIGN THEIR REQUESTS TO EXTENSION!
-        const pluginId = request.sheetmonkey.params.pluginId
+        D.assert(typeof request.sheetmonkey.params.hasOwnProperty('pluginID'), 'expected pluginID prop!')
+        // TODO: DON'T TRUST THIS pluginID WE NEED PLUGINS TO SIGN THEIR REQUESTS TO EXTENSION!
+        const pluginID = request.sheetmonkey.params.pluginID
         const scope = ('scope' in request.sheetmonkey.params && request.sheetmonkey.params.scopes) || 'READ_SHEETS'
 
-        // ensure that the pluginId has a apiClientID:
+        // ensure that the pluginID has a apiClientID:
         this.getRegisteredPluginsImpl().then(pluginRegistry => {
           D.log('pluginRegistry:', pluginRegistry)
-          const plugin = pluginRegistry.find(p => p.manifest.id === pluginId)
+          const plugin = pluginRegistry.find(p => p.manifest.id === pluginID)
           if (!plugin) {
-            throw new Error(`plugin with pluginId "${pluginId}" not found.`)
+            throw new Error(`plugin with pluginID "${pluginID}" not found.`)
           }
           if (!plugin.manifest.apiClientID) {
-            throw new Error(`plugin with pluginId "${pluginId}" does not have a clientID. Ensure that apiClientID is in the published manifest.`)
+            throw new Error(`plugin with pluginID "${pluginID}" does not have a clientID. Ensure that apiClientID is in the published manifest.`)
           }
           // Get the email address from the tab that sent us this request
           return this.getEmailAddress(sender.tab.id).then(email => {
@@ -183,8 +183,8 @@ class Background {
     })
   }
 
-  getRedirectUri (pluginId) {
-    return chrome.identity.getRedirectURL(pluginId)
+  getRedirectUri (pluginID) {
+    return chrome.identity.getRedirectURL(pluginID)
   }
 
   /**

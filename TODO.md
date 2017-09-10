@@ -23,17 +23,13 @@
       - [x] Server: Setup auth endpoint that extension can use for authflow.
         - [x] Input is [pluginid, extension_redirect_uri], uses that to fetch clientid and redirect to ss.com auth endpoint.
         - [x] Upon auth, user is redirected back to sheetmonkey-server and he catches the code and uses plugin's registered client secret to get tokens and redirects to extension.
-        - [x] Extension: Catches tokens, saves them
-        - [ ] Extension: Expose an api to plugins to call api: ssapi(httpMethod, operationPath, headers, data)
+        - [x] Extension: Catches tokens, saves them 
+        - [x] Extension: Expose an api to plugins to call api: ssapi(httpMethod, operationPath, headers, data)
             - When plugin reqeusts API operation, he uses saved tokens to auth API requests.
       
       - Later:
         - [ ] Token Refresh: To refresh tokens, sheetmonkey.com can just provide the service. Give the exntesion the refresh token too and let him manage it. Or ignore it, and when the token expires just spin up another auth flow.
         - [ ] Store tokens w/ app-fetched email address. Since extension could be in a browser that goes through one auth flow and gets a API token, then later the user logs out of app and logs in with a different user, we must attach each token to apluginID AND and user (email address).
-
-* Modify CORS preflight response header to include the right allow-origin headers:
-    * see `onHeadersReceived` at https://developer.chrome.com/extensions/webRequest . Can the allow-origin header be hacked there?
-
 
 
 * Add https://developer.chrome.com/apps/analytics to extension /store listing
@@ -50,6 +46,8 @@
             - JWT: Why not just start using JWT with the keys? Use claims in the JWT for command, params, and very short time-based expiration of JWT
                 - NOTE there appear to be no relevant size limitationsin postMessage or JWT.
             - Alternate: https://w3c.github.io/webcrypto/Overview.html
+
+- [ ] Fork https://github.com/smartsheet-platform/smartsheet-javascript-sdk and make it work in extension environment (XHR instead of node request) and use that instead of raw rest calls.
 
 - [ ] Sheet Command (copy permalink to clipboard)
 - [ ] Row Command (copy permalink to clipboard)

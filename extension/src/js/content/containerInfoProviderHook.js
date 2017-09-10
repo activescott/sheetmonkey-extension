@@ -1,4 +1,5 @@
-'use strict' /* global MouseEvent */
+/* global MouseEvent */
+'use strict'
 import Promise from 'bluebird'
 import $ from 'jquery'
 import SheetHook from './SheetHook.js'
@@ -20,23 +21,21 @@ class ContainerInfoProviderHook extends SheetHook {
     // D.log('receiveMessage! eventType:', event.data && event.data.hasOwnProperty('eventType') ? event.data.eventType : '<none>', 'event:', event)
     let msg = event.data
     if (msg.eventType === Constants.messageGetContainerID) {
-      D.assert(msg.pluginId, 'Expected pluginId on message!')
-      if (msg.pluginId) {
+      D.assert(msg.pluginID, 'Expected pluginID on message!')
+      if (msg.pluginID) {
         this.getContainerInfo().then(containerInfo => {
           containerInfo.eventType = Constants.messageGetContainerIDResponse
-          this.pluginHost.postMessageToPlugin(msg.pluginId, containerInfo)
+          this.pluginHost.postMessageToPlugin(msg.pluginID, containerInfo)
         })
       }
     } else if (msg.eventType === Constants.messageGetSelectionInfo) {
-      D.assert(msg.pluginId, 'Expected pluginId on message!')
-      if (msg.pluginId) {
+      D.assert(msg.pluginID, 'Expected pluginID on message!')
+      if (msg.pluginID) {
         this.getSelectionInfo().then(selectionInfo => {
           selectionInfo.eventType = Constants.messageGetSelectionInfoResponse
-          this.pluginHost.postMessageToPlugin(msg.pluginId, selectionInfo)
+          this.pluginHost.postMessageToPlugin(msg.pluginID, selectionInfo)
         })
       }
-    } else {
-      D.log('Unrecognized command: ', msg.eventType)
     }
   }
 

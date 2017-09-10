@@ -45,33 +45,33 @@ class PluginHost {
     }
   }
 
-  getPluginFrame (pluginId) {
-    const selector = `iframe[data-sheetmonkey-pluginid="${pluginId}"]`
+  getPluginFrame (pluginID) {
+    const selector = `iframe[data-sheetmonkey-pluginid="${pluginID}"]`
     const frame = $(selector)
     D.assert(frame.length === 1, `expected exactly one plugin host, but found ${frame.length}! Selector: ${selector}`)
     return frame.first()
   }
 
-  postMessageToPlugin (pluginId, message) {
-    let f = this.getPluginFrame(pluginId)
+  postMessageToPlugin (pluginID, message) {
+    let f = this.getPluginFrame(pluginID)
     if (!f || (f.length === 0)) {
-      throw new Error(`frame for plugin '${pluginId}' not found.`)
+      throw new Error(`frame for plugin '${pluginID}' not found.`)
     }
-        // ensure the message has pluginId on it:
-    if (!message.pluginId) { message.pluginId = pluginId }
+        // ensure the message has pluginID on it:
+    if (!message.pluginID) { message.pluginID = pluginID }
 
     let window = f.prop('contentWindow')
     const targetOrigin = '*'
     window.postMessage(message, targetOrigin)
   }
 
-  notifyCommandClicked (pluginId, commandId) {
+  notifyCommandClicked (pluginID, commandId) {
     const msg = {
       eventType: 'command_click',
-      pluginId: pluginId,
+      pluginID: pluginID,
       commandId: commandId
     }
-    this.postMessageToPlugin(pluginId, msg)
+    this.postMessageToPlugin(pluginID, msg)
   }
 }
 

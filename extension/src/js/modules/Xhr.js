@@ -1,5 +1,8 @@
 /* global XMLHttpRequest */
 'use strict'
+import Diag from './diag'
+
+const D = new Diag('Xhr')
 
 class Xhr {
   /**
@@ -23,6 +26,27 @@ class Xhr {
       xhr.onload = () => resolve(xhr.responseText)
       xhr.onerror = () => reject(xhr.statusText)
       xhr.send()
+    })
+  }
+
+  /**
+   * Promisified http request that allows specifying the request method.
+   * @param {*string} httpMethod HTTP method to use
+   * @param {*} url The URL to send the HTTP request to.
+   * @param {*} headers A hash of request headers to send with the request
+   * @param {*} data If a post, the data to send with the request.
+   */
+  static request (httpMethod, url, headers, data) {
+    return new Promise((resolve, reject) => {
+      D.log('request (', httpMethod, url, headers, data, ')')
+      var xhr = new XMLHttpRequest()
+      xhr.open(httpMethod, url, true)
+      headers = headers || {}
+      Object.getOwnPropertyNames(headers).forEach(key => xhr.setRequestHeader(key, headers[key]))
+      xhr.onload = () => resolve(xhr.responseText)
+      xhr.onerror = () => reject(xhr.statusText)
+      if (data) xhr.send(data)
+      else xhr.send()
     })
   }
 }

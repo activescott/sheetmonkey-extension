@@ -73,13 +73,13 @@ class MenuSheetHook extends SheetHook {
     var eventType = e.type
     if (eventType === 'click' && isCommand) {
       var commandId = parent.attr('data-sheetmonkey-commandid')
-      var pluginId = parent.attr('data-sheetmonkey-pluginid')
+      var pluginID = parent.attr('data-sheetmonkey-pluginid')
       let myCommandIDs = Array.from(this.getMenuCommandsToInsert()).map(cmd => cmd.id)
 
       if (myCommandIDs.indexOf(commandId) >= 0) {
         this.dismissMenu()
-        D.log('Routing command click to plugin... PluginID:', pluginId, 'CommandID:', commandId)
-        this.pluginHost.notifyCommandClicked(pluginId, commandId)
+        D.log('Routing command click to plugin... PluginID:', pluginID, 'CommandID:', commandId)
+        this.pluginHost.notifyCommandClicked(pluginID, commandId)
         return true
       } else {
         D.log(`Command ${commandId} not mine! myCommandIDs:`, myCommandIDs)
@@ -140,12 +140,12 @@ class MenuSheetHook extends SheetHook {
     return elements
   }
 
-  createMenuElement (pluginId, commandId, label) {
+  createMenuElement (pluginID, commandId, label) {
     // building via jquery for proper/safe encoding:
     let tr = $('<tr>')
     tr.addClass(Constants.commandClassName)
-    tr.attr('id', `sheetMonkey_${pluginId}_${commandId}`)
-    tr.attr('data-sheetmonkey-pluginid', pluginId)
+    tr.attr('id', `sheetMonkey_${pluginID}_${commandId}`)
+    tr.attr('data-sheetmonkey-pluginid', pluginID)
     tr.attr('data-sheetmonkey-commandid', commandId)
     let td1 = $('<td style="margin-top:2px; height:16px; padding-left:15px;"></td>')
     let td2 = $('<td style="padding-right:15px; padding-left:0px; white-space:nowrap;" class="clsStandardMenuText"></td>')

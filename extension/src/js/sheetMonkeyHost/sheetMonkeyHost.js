@@ -16,9 +16,9 @@ class SheetMonkeyHost {
     window.addEventListener('message', this.receiveMessage.bind(this), false)
     if (!options) throw new Error('options missing')
     if (!options.commandHandler) throw new Error('commandHandler missing')
-    this._pluginId = window.data_sheetmonkey_pluginid
+    this._pluginID = window.data_sheetmonkey_pluginid
     this._ssOrigin = window.data_sheetmonkey_ssOrigin
-    D.log('Found my pluginid as', this._pluginId)
+    D.log('Found my pluginid as', this._pluginID)
     D.log('Found ss origin as', this._ssOrigin)
     this._commandHandler = options.commandHandler
     this._receiveMessageHandlers = [new CommandClickHandler(this)]
@@ -35,7 +35,6 @@ class SheetMonkeyHost {
       return
     }
     // TODO: Consider requiring extension to sign messages witha private key and to check the signature here.
-    let msg = event.data
     for (var handler of this._receiveMessageHandlers) {
       handler.tryReceiveMessage(event)
     }
@@ -49,63 +48,59 @@ class SheetMonkeyHost {
     }
   }
 
-  postMessageToSheetMonkey (message) {
+  /**
+   * Posts the message to sheetmonkey and returns the promise of a response for the specified responseEventType.
+   * @param {*object} message The message to post to sheetmonkey
+   * @param {*string} responseEventType The event type that sheetmonkey is expected to respond with.
+   */
+  postMessageToSheetMonkey (message, responseEventType) {
     // TODO: Consider having extension provide a signed secret to this script to provide back to the extension during communication.
     const targetOrigin = this._ssOrigin
+    // Set up the response
+    var resolver
+    var rejecter
+    let responsePromise = new Promise((resolve, reject) => {
+      resolver = resolve
+      rejecter = reject
+    })
+    this._receiveMessageHandlers.push(new ResolveResponseUponEventTypeHandler(resolver, rejecter, responseEventType))
+    // send message
     window.parent.postMessage(message, targetOrigin)
+    return responsePromise
   }
 
   /**
   * Returns a Promise of the active container's ID (SheetID, SightID, etc.).
   */
   getContainerInfo () {
-    var resolver
-    var rejecter
-    let p = new Promise((resolve, reject) => {
-      resolver = resolve
-      rejecter = reject
-    })
-    this._receiveMessageHandlers.push(new GetContainerIDResponseHandler(resolver, rejecter))
     let msg = {
       eventType: Constants.messageGetContainerID,
-      pluginId: this._pluginId
+      pluginID: this._pluginID
     }
-    this.postMessageToSheetMonkey(msg)
-    return p
+    return this.postMessageToSheetMonkey(msg, Constants.messageGetContainerIDResponse)
   }
 
   getSelectionInfo () {
-    D.log('getSelectionInfo')
-    var resolver
-    var rejecter
-    let p = new Promise((resolve, reject) => {
-      resolver = resolve
-      rejecter = reject
-    })
-    this._receiveMessageHandlers.push(new GetSelectionInfoResponseHandler(resolver, rejecter))
     let msg = {
       eventType: Constants.messageGetSelectionInfo,
-      pluginId: this._pluginId
+      pluginID: this._pluginID
     }
-    this.postMessageToSheetMonkey(msg)
-    return p
+    return this.postMessageToSheetMonkey(msg, Constants.messageGetSelectionInfoResponse)
   }
 
-  launchAuthFlow () {
-    D.log('launchAuthFlow')
-    var resolver
-    var rejecter
-    let p = new Promise((resolve, reject) => {
-      resolver = resolve
-      rejecter = reject
-    })
-    this._receiveMessageHandlers.push(new LaunchAuthFlowResponseHandler(resolver, rejecter))
+  /**
+   * Calls the smartsheet REST api as specified and returns the result.
+   */
+  apiRequest (method, path, headers, data) {
     let msg = {
-      eventType: Constants.messageLaunchAuthFlow,
-      pluginId: this._pluginId
+      eventType: Constants.messageApiRequest,
+      pluginID: this._pluginID,
+      method,
+      path,
+      headers,
+      data
     }
-    this.postMessageToSheetMonkey(msg)
-    return p
+    return this.postMessageToSheetMonkey(msg, Constants.messageApiRequestResponse)
   }
 }
 
@@ -138,7 +133,7 @@ class CommandClickHandler extends ReceiveMessageHandler {
     if (msg.eventType && msg.eventType === 'command_click') {
       const cmdInfo = {
         eventType: msg.eventType,
-        pluginId: msg.pluginId,
+        pluginID: msg.pluginID,
         commandId: msg.commandId
       }
       this._host._commandHandler(cmdInfo)
@@ -166,37 +161,15 @@ class ResponseHandler extends ReceiveMessageHandler {
   }
 }
 
-class GetContainerIDResponseHandler extends ResponseHandler {
-  tryReceiveMessage (event) {
-    let msg = event.data
-    if (msg.eventType && msg.eventType === Constants.messageGetContainerIDResponse) {
-      D.assert(msg.containerType, 'expected containerType to be defined')
-      D.assert(msg.containerID, 'expected containerID to be defined')
-      this.resolve(msg) // <- Resolves the promise provided in the sheetmonkeyhost method.
-      return true
-    }
-    return false
+class ResolveResponseUponEventTypeHandler extends ResponseHandler {
+  constructor (resolver, rejecter, eventType) {
+    super(resolver, rejecter)
+    this.eventType = eventType
   }
-}
-
-class GetSelectionInfoResponseHandler extends ResponseHandler {
   tryReceiveMessage (event) {
     let msg = event.data
-    if (msg.eventType && msg.eventType === Constants.messageGetSelectionInfoResponse) {
-      D.assert(msg.hasOwnProperty('rowID'), `Expected msg ${msg.eventType} to have rowID`)
-      this.resolve(msg) // <- Resolves the promise provided in the sheetmonkeyhost method.
-      return true
-    }
-    return false
-  }
-}
-
-class LaunchAuthFlowResponseHandler extends ResponseHandler {
-  tryReceiveMessage (event) {
-    let msg = event.data
-    if (msg.eventType && msg.eventType === Constants.messageLaunchAuthFlowResponse) {
-      // TODO: assert something... D.assert(msg.hasOwnProperty('rowID'), `Expected msg ${msg.eventType} to have rowID`)
-      this.resolve(msg) // <- Resolves the promise provided in the sheetmonkeyhost method.
+    if (msg.eventType && msg.eventType === this.eventType) {
+      this.resolve(msg)
       return true
     }
     return false

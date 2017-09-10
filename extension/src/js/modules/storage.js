@@ -38,7 +38,7 @@ class Storage {
   static saveAccessTokenForPlugin (pluginManifestUrl, userEmail, jwtStr) {
     return JwtHelper.decode(jwtStr).then(claims => {
       if (!('aud' in claims) || claims.aud !== pluginManifestUrl) {
-        throw new Error('received token not designated for this plugin')
+        throw new Error(`received token not designated for this plugin. aud:${claims.aud}, pluginManifestUrl:${pluginManifestUrl}`)
       }
       if (!('prneml' in claims) || claims.prneml !== userEmail) {
         throw new Error('received token ont designated for this user')
@@ -72,16 +72,15 @@ class Storage {
     return storageLocal.getAsync(defaultData).then(storedData => {
       if (chrome.runtime.lastError) { throw chrome.runtime.lastError }
       const jwtStr = storedData[storageKey]
-      D.log('found jwtStr:', jwtStr)
       if (!jwtStr) {
         return null
       }
       return JwtHelper.decode(jwtStr).then(claims => {
         if (!('aud' in claims) || claims.aud !== pluginManifestUrl) {
-          throw new Error('received token not designated for this plugin')
+          throw new Error(`received token not designated for this plugin. aud:${claims.aud}, pluginManifestUrl:${pluginManifestUrl}`)
         }
         if (!('prneml' in claims) || claims.prneml !== userEmail) {
-          throw new Error('received token ont designated for this user')
+          throw new Error('received token not designated for this user')
         }
         // if expired, don't bother return it, just act as if it doesn't exist:
         if (new Date(claims.expires_at) < new Date()) {

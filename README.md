@@ -58,7 +58,7 @@ All URLS in manifest and scripts must be relative to the plugin's manifest.
 
 ### Scripts ###
 Your scripts are just plain JavaScript that will run in a sandboxed frame. 
-You initialize your plugin by calling `SheetMonkeyHost.init` and passing in the pluginId (must be the same one found in your manifest) and a commandHandler to receive events about your commands.
+You initialize your plugin by calling `SheetMonkeyHost.init` and passing in the pluginID (must be the same one found in your manifest) and a commandHandler to receive events about your commands.
 
 See [sheetmonkey-plugins](https://github.com/activescott/sheetmonkey-plugins) for examples.
 
