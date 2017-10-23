@@ -95,7 +95,7 @@ class Background {
         D.assert(request && request.hasOwnProperty('sheetmonkey'), 'expected request to have sheetmonkey prop')
         D.assert(request.sheetmonkey.hasOwnProperty('params'), 'expected params')
         D.assert(typeof request.sheetmonkey.params.hasOwnProperty('pluginID'), 'expected pluginID prop!')
-        // TODO: DON'T TRUST THIS pluginID WE NEED PLUGINS TO SIGN THEIR REQUESTS TO EXTENSION!
+        // TODO: DON'T TRUST THIS pluginID! WE NEED PLUGINS TO SIGN THEIR REQUESTS TO EXTENSION!
         const pluginID = request.sheetmonkey.params.pluginID
         const scope = ('scope' in request.sheetmonkey.params && request.sheetmonkey.params.scopes) || 'READ_SHEETS'
 
@@ -136,15 +136,13 @@ class Background {
               }
               const jwtWithToken = urlFlowResult.query.tokenInfo
               /** jwtWithToken has the following relevant claims in it (as encoded by sheetmonkey-server)
-               * - access_token: SS API Access Token
-               * - expires_at: Time that the accesstoken expires.
                * - prn: The SS users' User ID for the user who just authorized.
                * - prneml: The SS users' email address for the user who just authorized.
                * - aud: The manifest URL of the plugin that the token is for
               */
               // D.log('jwtWithToken:', jwtWithToken)
               return JwtHelper.decode(jwtWithToken).then(claims => {
-                // D.log('claims:', claims)
+                D.log('chrome flowResult token claims:', claims)
                 return Storage.saveAccessTokenForPlugin(plugin.manifestUrl, email, jwtWithToken).then(() => {
                   // let the plugin know we succeeded. If we didn't, a catch below should be hit and return an object that is `instanceof Error`
                   sendResponse({success: true})

@@ -49,7 +49,7 @@ class ApiRequestSheetHook extends SheetHook {
           D.log('authResponse:', authResponse)
           if (authResponse.success) {
             // now it should be saved, so try again...
-            return Storage.getAccessTokenForPlugin(pluginID, userEmail)
+            return Storage.getAccessTokenForPlugin(manifestUrl, userEmail)
           } else {
             throw new Error('Authorization flow for plugin failed')
           }
@@ -83,10 +83,13 @@ class ApiRequestSheetHook extends SheetHook {
       if (!(p in message)) throw new Error(`Expected message to have property ${p}`)
     })
     return this.getAccessTokenForPlugin(message.pluginID).then(accessToken => {
+      if (!accessToken) {
+        throw new Error('failed to get access token for plugin "', message.pluginID, '".')
+      }
       let headers = {
         'Authorization': `Bearer ${accessToken}`
       }
-      const BASE_URL = 'https://api.smartsheet.com/2.0'
+      const BASE_URL = 'https://beta.sheetmonkey.com/api/ssapiproxy'
       let url
       if (message.path.startsWith('http')) {
         url = message.path
