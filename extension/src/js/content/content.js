@@ -1,5 +1,6 @@
 'use strict' /* global chrome */
 import AccountMenuSheetHook from './AccountMenuSheetHook.js'
+import SheetMenuSheetHook from './SheetMenuSheetHook.js'
 import CellContextMenuSheetHook from './CellContextMenuSheetHook.js'
 import ContainerInfoProviderHook from './ContainerInfoProviderHook.js'
 import ApiRequestSheetHook from './ApiRequestSheetHook'
@@ -34,6 +35,7 @@ function initPlugins () {
 function initSheetHooks (registeredPlugins) {
   return [
     new AccountMenuSheetHook(pluginHost, registeredPlugins, document),
+    new SheetMenuSheetHook(pluginHost, registeredPlugins, document),
     new CellContextMenuSheetHook(pluginHost, registeredPlugins, document),
     new ContainerInfoProviderHook(pluginHost, registeredPlugins, document),
     new ApiRequestSheetHook(pluginHost, registeredPlugins, document),

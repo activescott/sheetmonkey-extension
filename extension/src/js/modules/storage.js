@@ -71,7 +71,6 @@ class Storage {
 
     return storageLocal.getAsync(defaultData).then(storedData => {
       if (chrome.runtime.lastError) { throw chrome.runtime.lastError }
-      D.log('getAccessTokenForPlugin storedData:', storedData)
       const jwtStr = storedData[storageKey]
       if (!jwtStr) {
         D.error('No value for storageKey "', storageKey, '".')
@@ -85,9 +84,9 @@ class Storage {
           throw new Error('received token not designated for this user')
         }
         // if expired, don't bother return it, just act as if it doesn't exist:
-        D.log('returning token w/ claims:', claims)
+        // D.log('returning token w/ claims:', claims)
         const expiresAtDate = new Date(claims.expires_at * 1000)
-        D.log('Token expires_at:', new Date(expiresAtDate))
+        // D.log('Token expires_at:', new Date(expiresAtDate))
         if (expiresAtDate.toString() === 'Invalid Date') {
           D.error('Invalid date claim: ', claims.expires_at)
           return null

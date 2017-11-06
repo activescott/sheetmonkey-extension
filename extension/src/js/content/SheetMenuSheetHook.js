@@ -4,24 +4,24 @@ import MenuSheetHook from './MenuSheetHook'
 import Constants from '../modules/Constants.js'
 
 /**
-* Hooks into the Account menu so that new menu items can be added there.
+* Hooks into the Sheet menu so that new menu items can be added there.
 */
-class AccountMenuSheetHook extends MenuSheetHook {
+class SheetMenuSheetHook extends MenuSheetHook {
   /**
    * Should return a css selector that will select a menuitem on the desired menu.
    */
   get menuElementSelector () {
-    // 10727 is Sign Out
-    return 'div.clsPopupMenu tr[data-client-id="10727"]'
+    // 10625 is "Properties..."
+    return 'div.clsPopupMenu tr[data-client-id="10625"]'
   }
 
   /**
    * Should return the actual clsPopupMenu element (not a menu item, but the menu).
    */
   getMenuElement () {
-    // 10727 is Sign Out
+    // 10625 is "Properties..."
     // NOTE non-standard jquery ":has" selector here
-    var menuElem = $('div.clsPopupMenu:has(tr[data-client-id="10727"])')
+    var menuElem = $('div.clsPopupMenu:has(tr[data-client-id="10625"])')
     if (menuElem.length > 0) {
       return menuElem.get(0)
     }
@@ -35,7 +35,7 @@ class AccountMenuSheetHook extends MenuSheetHook {
   * getMenuCommandsToInsert () {
     for (var p of this.plugins) {
       for (let cmd of p.manifest.commands) {
-        if (cmd.kind === Constants.account_menu) {
+        if (cmd.kind === Constants.sheet_menu) {
           let menuCmd = {
             pluginID: p.manifest.id,
             id: cmd.id,
@@ -48,4 +48,4 @@ class AccountMenuSheetHook extends MenuSheetHook {
   }
 }
 
-export default AccountMenuSheetHook
+export default SheetMenuSheetHook

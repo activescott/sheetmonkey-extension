@@ -15,16 +15,19 @@ class ApiRequestSheetHook extends SheetHook {
   }
 
   receiveMessage (event) {
-    D.log('receiveMessage! eventType:', event.data && event.data.hasOwnProperty('eventType') ? event.data.eventType : '<none>', 'event:', event)
+    // D.log('receiveMessage! eventType:', event.data && event.data.hasOwnProperty('eventType') ? event.data.eventType : '<none>', 'event:', event)
     let msg = event.data
     if (msg.eventType === Constants.messageApiRequest) {
       D.assert(msg.pluginID, 'Expected pluginID on message!')
       if (msg.pluginID) {
         return this.apiRequest(msg).then(apiResponse => {
-          D.log('apiResponse:', apiResponse)
+          // D.log('apiResponse:', apiResponse)
           if (!apiResponse) apiResponse = {}
-          apiResponse.eventType = Constants.messageApiRequestResponse
-          this.pluginHost.postMessageToPlugin(msg.pluginID, apiResponse)
+          const responseMessage = {
+            eventType: Constants.messageApiRequestResponse,
+            response: apiResponse
+          }
+          this.pluginHost.postMessageToPlugin(msg.pluginID, responseMessage)
         })
       }
     }
@@ -101,6 +104,7 @@ class ApiRequestSheetHook extends SheetHook {
         }
       }
       return Xhr.request(message.method, url, headers, message.data).then(responseText => {
+        // D.log('API responseText:', responseText)
         // API always returns json, so parse it here:
         try {
           let parsed = JSON.parse(responseText)

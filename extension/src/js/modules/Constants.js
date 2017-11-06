@@ -9,6 +9,9 @@ class Constants {
   static get account_menu () { // eslint-disable-line camelcase
     return 'account_menu'
   }
+  static get sheet_menu () { // eslint-disable-line camelcase
+    return 'sheet_menu'
+  }
   static get cell_context_menu () { // eslint-disable-line camelcase
     return 'cell_context_menu'
   }

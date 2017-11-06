@@ -29,7 +29,7 @@ class SheetMonkeyHost {
   * @param {*object} event
   */
   receiveMessage (event) {
-    D.log('receiveMessage:', event)
+    // D.log('receiveMessage:', event)
     if (['https://app.smartsheet.com', 'https://mars.lab.smartsheet.com'].indexOf(event.origin) < 0) {
       D.log('Ignoring message from untrusted origin:', event.origin)
       return
@@ -42,7 +42,7 @@ class SheetMonkeyHost {
     for (var i = 0; i < this._receiveMessageHandlers.length; i++) {
       let h = this._receiveMessageHandlers[i]
       if (h.stopListening) {
-        D.log('Removing ReceiveMessageHandler:', h)
+        // D.log('Removing ReceiveMessageHandler:', h)
         this._receiveMessageHandlers.splice(i, 1)
       }
     }

@@ -90,7 +90,7 @@ class MenuSheetHook extends SheetHook {
 
   dismissMenu () {
     // we have to do this as SS won't dismiss it when a plugin menu item is clicked.
-    var menu = this.getMenuElement()
+    let menu = this.getMenuElement()
     if (!menu) return
     if (!menu.classList.contains('clsPopupMenu')) {
       throw new Error('expected getMenuElement to return an menu with class getMenuElement.')
@@ -99,12 +99,14 @@ class MenuSheetHook extends SheetHook {
   }
 
   insertMenuCommands () {
-    let signOutMenuItem = this.getMenuElement().querySelector('tr:last-child[data-client-id]')
+    let menu = this.getMenuElement()
+    if (!menu) return
+    let signOutMenuItem = menu.querySelector('tr:last-child[data-client-id]')
     if (signOutMenuItem.length === 0) {
       throw new Error('insertMenuCommands: ":last-child" menu item not found!')
     }
     signOutMenuItem = $(signOutMenuItem) // convert it to jquery
-    var placeHolderElement = null
+    let placeHolderElement = null
     for (let menuCommand of this.getMenuCommandsToInsert()) {
       D.log('initializing command ', menuCommand)
       for (let requiredProp of ['pluginID', 'id', 'label']) {

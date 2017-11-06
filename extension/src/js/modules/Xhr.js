@@ -38,7 +38,7 @@ class Xhr {
    */
   static request (httpMethod, url, headers, data) {
     return new Promise((resolve, reject) => {
-      D.log('request (', httpMethod, url, headers, data, ')')
+      // D.log('request (', httpMethod, url, headers, data, ')')
       var xhr = new XMLHttpRequest()
       xhr.open(httpMethod, url, true)
       headers = headers || {}

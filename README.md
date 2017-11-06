@@ -1,4 +1,4 @@
-SheetMonkey
+SheetMonkey Extension
 ======
 **SheetMonkey** is an experimental browser extension for Google Chrome that enables plugins to extend [Smartsheet](https://www.smartsheet.com/) in a modular fashion without DOM hacks.
 

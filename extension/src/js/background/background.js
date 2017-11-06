@@ -97,7 +97,7 @@ class Background {
         D.assert(typeof request.sheetmonkey.params.hasOwnProperty('pluginID'), 'expected pluginID prop!')
         // TODO: DON'T TRUST THIS pluginID! WE NEED PLUGINS TO SIGN THEIR REQUESTS TO EXTENSION!
         const pluginID = request.sheetmonkey.params.pluginID
-        const scope = ('scope' in request.sheetmonkey.params && request.sheetmonkey.params.scopes) || 'READ_SHEETS'
+        const scope = ('scope' in request.sheetmonkey.params && request.sheetmonkey.params.scopes) || 'READ_SHEETS ADMIN_SHEETS ADMIN_SIGHTS ADMIN_USERS ADMIN_WEBHOOKS ADMIN_WORKSPACES CREATE_SHEETS CREATE_SIGHTS DELETE_SHEETS DELETE_SIGHTS READ_CONTACTS READ_SHEETS READ_SIGHTS READ_USERS SHARE_SHEETS SHARE_SIGHTS WRITE_SHEETS'
 
         // ensure that the pluginID has a apiClientID:
         this.getRegisteredPluginsImpl().then(pluginRegistry => {
@@ -128,6 +128,9 @@ class Background {
             }
             D.log('flowDetails:', flowDetails)
             return chromeIdentity.launchWebAuthFlowAsync(flowDetails).then(flowResult => {
+              if (chrome.runtime.lastError) {
+                D.log('runtime.lastError set during launchWebAuthFlowAsync. lastError:', chrome.runtime.lastError)
+              }
               D.log('chrome flowResult:', flowResult)
               // flowResult is a URL, parse out the tokenInfo querystring
               const urlFlowResult = urlmod.parse(flowResult, true)
