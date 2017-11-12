@@ -1,6 +1,6 @@
 {
   "name": "SheetMonkey",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "This extension enables Smartsheet to have extensible third party plugins.",
   "author": "scott@willeke.com",
   "license": "MIT",

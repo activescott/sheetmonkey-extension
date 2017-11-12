@@ -78,11 +78,11 @@ class Background {
             if (foundIndex >= 0) {
               loadedUrls.splice(foundIndex, 1)
               Storage.savePluginUrls(loadedUrls).then(() => {
-                D.log('plugin uninstalledinstalled.')
+                D.warn('plugin uninstalled.')
                 sendResponse(true)
               })
             } else {
-              D.log(`Plugin '${manifestUrl} not installed.`)
+              D.error(`Plugin '${manifestUrl} not installed.`)
               sendResponse(false)
             }
           })

@@ -5,12 +5,15 @@ import SheetHook from './SheetHook.js'
 import Constants from '../modules/Constants.js'
 import DomUtil from '../modules/DomUtil.js'
 
-const D = new Diag('MenuSheetHook')
-
 /**
 * Provides a base class for hooking into smartsheet menus to insert and manage commands.
 */
 class MenuSheetHook extends SheetHook {
+  constructor (pluginHost, registeredPlugins, document) {
+    super(pluginHost, registeredPlugins, document)
+    this.D = new Diag(this.constructor.name)
+  }
+
   onSmartsheetLoaded () {
     this.initListeners()
   }
@@ -29,9 +32,17 @@ class MenuSheetHook extends SheetHook {
     if (this.activeMenuListener != null) return
     // Don't start a listener while the menu is open. If it is already open the listener will immediately resolve and cause a loop here.
     if (this.getMenuElement() !== null) return
-
-    this.activeMenuListener = DomUtil.lazyQuerySelector(this.menuElementSelector).then(() => {
+    // Don't setup a listener if there are no items on the menu anyway:
+    let menuItems = this.getMenuCommandsToInsert()
+    if (!menuItems || menuItems.length < 1) return
+    // PERF: this.D.warn(`init lazyQuerySelector for ${this.constructor.name}`)
+    this.activeMenuListener = DomUtil.lazyQuerySelector(this.menuElementSelector).then(items => {
       this.activeMenuListener = null
+      if (!items) {
+        // then it was cancelled, so ignore
+        return
+      }
+      this.D.log(`menu appeared for ${this.constructor.name}:`, items)
       // menu appeared:
       this.insertMenuCommands()
     })
@@ -78,11 +89,11 @@ class MenuSheetHook extends SheetHook {
 
       if (myCommandIDs.indexOf(commandId) >= 0) {
         this.dismissMenu()
-        D.log('Routing command click to plugin... PluginID:', pluginID, 'CommandID:', commandId)
+        this.D.log('Routing command click to plugin... PluginID:', pluginID, 'CommandID:', commandId)
         this.pluginHost.notifyCommandClicked(pluginID, commandId)
         return true
       } else {
-        D.log(`Command ${commandId} not mine! myCommandIDs:`, myCommandIDs)
+        this.D.log(`Command ${commandId} not mine! myCommandIDs:`, myCommandIDs)
       }
     }
     return false
@@ -108,7 +119,7 @@ class MenuSheetHook extends SheetHook {
     signOutMenuItem = $(signOutMenuItem) // convert it to jquery
     let placeHolderElement = null
     for (let menuCommand of this.getMenuCommandsToInsert()) {
-      D.log('initializing command ', menuCommand)
+      this.D.log('initializing command ', menuCommand)
       for (let requiredProp of ['pluginID', 'id', 'label']) {
         if (!(requiredProp in menuCommand)) {
           throw new Error(`menu commands are required to have property "${requiredProp}".`)
